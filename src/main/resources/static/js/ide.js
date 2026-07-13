@@ -523,27 +523,32 @@
     if(!panelViz || !analyser) return;
     var canvas = panelViz;
     var ctx = canvas.getContext('2d');
-    var parent = canvas.parentElement;
     var bufLen = analyser.frequencyBinCount;
     var data = new Uint8Array(bufLen);
     var bars = 14;
     var half = Math.floor(bars / 2);
+    var maxH = 36;
 
-    function resize(){
-      canvas.width = parent.clientWidth;
-      canvas.height = parent.clientHeight;
+    function size(){
+      canvas.style.width = '';
+      canvas.style.height = '';
+      var w = canvas.parentElement.clientWidth || window.innerWidth - 200;
+      if(w < 100) w = 400;
+      canvas.width = w;
+      canvas.height = 40;
     }
-    resize();
-    window.addEventListener('resize', resize);
+    size();
 
     function draw(){
       bottomVizId = requestAnimationFrame(draw);
       analyser.getByteFrequencyData(data);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      var barW = (canvas.width / bars) * 0.7;
-      var gap = (canvas.width / bars) * 0.3;
-      var maxH = canvas.height - 4;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0d0d0d';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      var barW = Math.max(2, (canvas.width / bars) * 0.6);
+      var gap = Math.max(1, (canvas.width / bars) * 0.4);
 
       for(var i = 0; i < half; i++){
         var lIdx = i;
@@ -552,22 +557,25 @@
 
         var lVal = data[lIdx] / 255;
         var rVal = data[rIdx] / 255;
+        var lh = Math.max(1, lVal * maxH);
+        var rh = Math.max(1, rVal * maxH);
 
         // Left side: bars grow from left edge rightward
         var lx = i * (barW + gap) + gap/2;
-        var lh = lVal * maxH;
         ctx.fillStyle = '#007acc';
-        ctx.fillRect(lx, canvas.height - 2 - lh, barW, lh);
+        ctx.fillRect(lx, canvas.height - 4 - lh, barW, lh);
 
         // Right side: bars grow from right edge leftward
         var rx = canvas.width - (i + 1) * (barW + gap) + gap/2;
-        var rh = rVal * maxH;
-        ctx.fillRect(rx, canvas.height - 2 - rh, barW, rh);
+        ctx.fillStyle = '#1a8ad4';
+        ctx.fillRect(rx, canvas.height - 4 - rh, barW, rh);
       }
 
-      // Center gap indicator
-      ctx.fillStyle = '#333';
-      ctx.fillRect(canvas.width/2 - 1, canvas.height - 6, 2, 4);
+      // Center dot
+      ctx.fillStyle = '#555';
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height - 4, 2, 0, Math.PI * 2);
+      ctx.fill();
     }
     draw();
   }
@@ -576,7 +584,7 @@
     if(bottomVizId){ cancelAnimationFrame(bottomVizId); bottomVizId = null; }
     if(panelViz){
       var ctx = panelViz.getContext('2d');
-      if(ctx) ctx.clearRect(0, 0, panelViz.width, panelViz.height);
+      if(ctx){ ctx.clearRect(0, 0, panelViz.width, panelViz.height); }
     }
   }
 
