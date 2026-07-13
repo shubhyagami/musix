@@ -189,9 +189,24 @@ public class YouTubeService {
             .build();
 
         HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+        String responseBody = res.body();
 
         com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-        Map<String, Object> result = mapper.readValue(res.body(), Map.class);
+        Map<String, Object> result = mapper.readValue(responseBody, Map.class);
+
+        // Check status field — rapidapi returns {"status":"fail","error":"..."} on errors
+        Object status = result.get("status");
+        if ("fail".equals(status)) {
+            Object errMsg = result.get("error");
+            throw new RuntimeException("RapidAPI error: " + (errMsg != null ? errMsg : "unknown") + " (HTTP " + res.statusCode() + ")");
+        }
+
+        // Check progress — sometimes the API returns a link before the conversion is ready
+        Object progress = result.get("progress");
+        if (progress instanceof Number && ((Number)progress).intValue() < 100) {
+            throw new RuntimeException("Conversion not ready (progress: " + progress + "%)");
+        }
+
         return result;
     }
 
@@ -216,6 +231,7 @@ public class YouTubeService {
         HttpRequest dlReq = HttpRequest.newBuilder()
             .uri(URI.create(dlUrl))
             .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header("Referer", "https://youtube-mp36.p.rapidapi.com/")
             .GET()
             .build();
 
@@ -224,10 +240,17 @@ public class YouTubeService {
             Files.copy(in, outPath, StandardCopyOption.REPLACE_EXISTING);
         }
 
+        int dlStatus = dlRes.statusCode();
+        if (dlStatus != 200) {
+            Files.deleteIfExists(outPath);
+            throw new RuntimeException("Download failed with HTTP " + dlStatus + " (RapidAPI link expired?)");
+        }
+
         // Validate the downloaded file is actually an MP3
+        long fileSize = Files.size(outPath);
         if (!isValidMp3(outPath)) {
             Files.deleteIfExists(outPath);
-            throw new RuntimeException("Downloaded file is not a valid MP3 (RapidAPI link may have expired)");
+            throw new RuntimeException("Not a valid MP3 (" + fileSize + " bytes downloaded) — RapidAPI link expired");
         }
 
         return outPath;
