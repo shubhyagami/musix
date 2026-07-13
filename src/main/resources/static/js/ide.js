@@ -611,7 +611,13 @@
   });
 
   audioPlayer.addEventListener('timeupdate',updateMusicProgress);
-  audioPlayer.addEventListener('ended',function(){isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);});
+  audioPlayer.addEventListener('ended',function(){
+    isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);
+    var track=musicResults[currentTrackIndex];
+    if(track&&track.videoId){
+      fetch('/api/music/'+track.videoId,{method:'DELETE'}).catch(function(){});
+    }
+  });
   musicProgress.addEventListener('input',function(){if(audioPlayer.duration){audioPlayer.currentTime=(musicProgress.value/100)*audioPlayer.duration;}});
   musicVolume.addEventListener('input',function(){if(audioPlayer){audioPlayer.volume=parseFloat(musicVolume.value);}});
   musicPlayBtn.addEventListener('click',togglePlay);

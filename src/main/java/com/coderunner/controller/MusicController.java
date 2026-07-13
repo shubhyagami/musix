@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,6 +79,20 @@ public class MusicController {
                 .contentType(MediaType.parseMediaType("audio/mpeg"))
                 .contentLength(Files.size(filePath))
                 .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/{videoId}")
+    public ResponseEntity<?> delete(@PathVariable String videoId) {
+        try {
+            Path filePath = Path.of("music", videoId + ".mp3");
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+                return ResponseEntity.ok(Map.of("status", "deleted"));
+            }
+            return ResponseEntity.ok(Map.of("status", "not_found"));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
         }
