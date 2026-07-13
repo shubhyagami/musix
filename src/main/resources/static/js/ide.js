@@ -29,6 +29,8 @@
   var trebleFilter = null;
   var sourceNode = null;
   var surroundEnabled = false;
+  var surrDelay = null;
+  var surrWetGain = null;
   var vizAnimId = null;
   var eqBassVal = 0;
   var eqTrebleVal = 0;
@@ -430,20 +432,52 @@
     });musicContent.innerHTML=h;
   }
 
-  // ─── Visualizer (time-based, no Web Audio needed) ──────────────────
+  // ─── Web Audio Graph ──────────────────────────────────────────────
+  function initAudioGraph(){
+    if(audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    bassFilter = audioCtx.createBiquadFilter();
+    bassFilter.type = 'lowshelf';
+    bassFilter.frequency.value = 200;
+    bassFilter.gain.value = 0;
+
+    trebleFilter = audioCtx.createBiquadFilter();
+    trebleFilter.type = 'highshelf';
+    trebleFilter.frequency.value = 3000;
+    trebleFilter.gain.value = 0;
+
+    // Surround: short delay mixed as wet signal for spaciousness
+    surrDelay = audioCtx.createDelay(0.1);
+    surrDelay.delayTime.value = 0.03;
+    surrWetGain = audioCtx.createGain();
+    surrWetGain.gain.value = 0;
+
+    sourceNode = audioCtx.createMediaElementSource(audioPlayer);
+    sourceNode.connect(bassFilter);
+    bassFilter.connect(trebleFilter);
+    trebleFilter.connect(audioCtx.destination);
+    trebleFilter.connect(surrDelay);
+    surrDelay.connect(surrWetGain);
+    surrWetGain.connect(audioCtx.destination);
+  }
+
+  function resumeAudioCtx(){
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  // ─── Visualizer (time-based, no AnalyserNode needed) ─────────────
   function startVisualizer(){
     stopVisualizer();
     var canvas=musicViz,ctx=canvas.getContext('2d');
     canvas.width=canvas.clientWidth||336;canvas.height=canvas.clientHeight||60;
     var barCount=6;
-    // Simulated frequency values (0-1)
     var freqs=[0,0,0,0,0,0];
 
     function draw(){
       vizAnimId=requestAnimationFrame(draw);
       ctx.clearRect(0,0,canvas.width,canvas.height);
       var w=canvas.width/barCount-4;
-      // Animate toward random targets for a lively feel
       for(var i=0;i<barCount;i++){
         var target=isPlaying?0.1+Math.random()*0.9:0;
         freqs[i]+=(target-freqs[i])*0.15;
@@ -467,11 +501,14 @@
     eqTrebleVal=parseFloat(eqTreble.value);
     eqBassValEl.textContent=eqBassVal+'dB';
     eqTrebleValEl.textContent=eqTrebleVal+'dB';
+    if(bassFilter) bassFilter.gain.value = eqBassVal;
+    if(trebleFilter) trebleFilter.gain.value = eqTrebleVal;
   }
 
   function toggleSurround(){
     surroundEnabled=!surroundEnabled;
     surroundBtn.classList.toggle('music-panel__surround-btn--active',surroundEnabled);
+    if(surrWetGain) surrWetGain.gain.value = surroundEnabled ? 0.35 : 0;
   }
 
   // ─── CD Player helpers ──────────────────────────────────────────────
@@ -513,20 +550,19 @@
     if(index<0||index>=musicResults.length)return;
     currentTrackIndex=index;var track=musicResults[index];
     if(!track.videoId)return;
-    // Pause previous
     if(isPlaying){try{audioPlayer.pause();}catch(e){}
     }else{stopVisualizer();}
-    // Show loading state
     nowPlaying.innerHTML='<div class="music-panel__loading"><span class="spinner"></span><span>Downloading...</span></div>';
     setCdLoading(true);
     showCdPlayer();
-    // Download MP3 to server, then play from local URL
     fetch('/api/music/download?id='+track.videoId, {method:'POST'})
     .then(function(r){return r.json();}).then(function(data){
       if(data.status==='ok'&&data.localUrl){
         nowPlaying.innerHTML='<div class="music-panel__loading"><span class="spinner"></span><span>Buffering...</span></div>';
+        initAudioGraph();
         audioPlayer.src=data.localUrl;
         audioPlayer.oncanplay=function(){
+          resumeAudioCtx();
           startVisualizer();
           audioPlayer.play().then(function(){
             isPlaying=true;
@@ -559,6 +595,8 @@
     if(currentTrackIndex<0)return;
     if(isPlaying)pauseTrack();
     else{
+      initAudioGraph();
+      resumeAudioCtx();
       startVisualizer();
       audioPlayer.play().then(function(){isPlaying=true;musicPlayBtn.textContent='\u23F8';renderMusicResults();setCdSpinning(true);}).catch(function(){console.warn('Play rejected (autoplay policy)');});
     }
