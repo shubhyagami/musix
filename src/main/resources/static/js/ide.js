@@ -32,7 +32,6 @@
   var surrDelay = null;
   var surrWetGain = null;
   var vizAnimId = null;
-  var bottomVizId = null;
   var eqBassVal = 0;
   var eqTrebleVal = 0;
 
@@ -99,7 +98,6 @@
   var cdProgress = document.getElementById('cdProgress');
   var cdTime = document.getElementById('cdTime');
   var cdToggle = document.getElementById('cdToggle');
-  var panelViz = document.getElementById('panelViz');
 
   // ─── Java class-to-import map ───────────────────────────────────────
   var JAVA_IMPORTS = {
@@ -408,7 +406,7 @@
 
   // ─── Music Player ───────────────────────────────────────────────────
   function openMusicPanel(){musicPanel.classList.remove('music-panel--closed');musicPanel.style.width=musicPanelWidth+'px';musicBtn.classList.add('activity-bar__btn--active');musicPanelOpen=true;}
-  function closeMusicPanel(){musicPanel.classList.add('music-panel--closed');musicBtn.classList.remove('activity-bar__btn--active');musicPanelOpen=false;pauseTrack();stopVisualizer();stopBottomViz();}
+  function closeMusicPanel(){musicPanel.classList.add('music-panel--closed');musicBtn.classList.remove('activity-bar__btn--active');musicPanelOpen=false;pauseTrack();stopVisualizer();stopFooterViz();}
   function toggleMusicPanel(){if(musicPanelOpen)closeMusicPanel();else{closeAiPanel();openMusicPanel();}}
 
   function searchMusic(query){
@@ -461,8 +459,14 @@
     sourceNode = audioCtx.createMediaElementSource(audioPlayer);
     sourceNode.connect(bassFilter);
     bassFilter.connect(trebleFilter);
+
+    // Analyser for footer visualizer
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 64;
     trebleFilter.connect(analyser);
     analyser.connect(audioCtx.destination);
+
+    // Surround: delay tap after trebleFilter
     trebleFilter.connect(surrDelay);
     surrDelay.connect(surrWetGain);
     surrWetGain.connect(audioCtx.destination);
@@ -500,6 +504,71 @@
     draw();
   }
 
+  // ─── Footer Stereo Visualizer (real audio data from AnalyserNode) ──
+  var footerVizAnimId = null;
+  var footerVizBuf = null;
+
+  function startFooterViz(){
+    stopFooterViz();
+    var canvas = document.getElementById('footerViz');
+    if(!canvas || !analyser) return;
+    var ctx = canvas.getContext('2d');
+    var rows = 8;
+    var gap = 2;
+    var bufLen = analyser.frequencyBinCount;
+    var data = new Uint8Array(bufLen);
+    var halfLen = Math.floor(bufLen / 2);
+
+    function size(){
+      canvas.style.width = '';
+      canvas.style.height = '';
+      var w = canvas.parentElement.clientWidth || window.innerWidth;
+      if(w < 100) w = 400;
+      canvas.width = w;
+      canvas.height = 20;
+    }
+    size();
+
+    function draw(){
+      footerVizAnimId = requestAnimationFrame(draw);
+      analyser.getByteFrequencyData(data);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0d0d0d';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      var barH = (canvas.height - 4 - gap * (rows - 1)) / rows;
+      if(barH < 2) barH = 2;
+
+      for(var i = 0; i < rows; i++){
+        var lIdx = Math.floor((i / rows) * halfLen);
+        var rIdx = halfLen + Math.floor((i / rows) * (bufLen - halfLen));
+        if(lIdx >= halfLen) lIdx = halfLen - 1;
+        if(rIdx >= bufLen) rIdx = bufLen - 1;
+
+        var lVal = data[lIdx] / 255;
+        var rVal = data[rIdx] / 255;
+
+        var y = 2 + i * (barH + gap);
+        var lw = Math.max(1, lVal * (canvas.width / 2 - 4));
+        var rw = Math.max(1, rVal * (canvas.width / 2 - 4));
+
+        ctx.fillStyle = '#007acc';
+        ctx.fillRect(2, y, lw, barH);
+        ctx.fillStyle = '#1a8ad4';
+        ctx.fillRect(canvas.width - 2 - rw, y, rw, barH);
+      }
+
+      ctx.fillStyle = '#2a2a2a';
+      ctx.fillRect(canvas.width / 2 - 1, 2, 2, canvas.height - 4);
+    }
+    draw();
+  }
+
+  function stopFooterViz(){
+    if(footerVizAnimId){ cancelAnimationFrame(footerVizAnimId); footerVizAnimId = null; }
+  }
+
   function stopVisualizer(){if(vizAnimId){cancelAnimationFrame(vizAnimId);vizAnimId=null;}}
 
   function updateEq(){
@@ -515,78 +584,6 @@
     surroundEnabled=!surroundEnabled;
     surroundBtn.classList.toggle('music-panel__surround-btn--active',surroundEnabled);
     if(surrWetGain) surrWetGain.gain.value = surroundEnabled ? 0.35 : 0;
-  }
-
-  // ─── Bottom panel audio visualizer ────────────────────────────────
-  function startBottomViz(){
-    stopBottomViz();
-    if(!panelViz || !analyser) return;
-    var canvas = panelViz;
-    var ctx = canvas.getContext('2d');
-    var bufLen = analyser.frequencyBinCount;
-    var data = new Uint8Array(bufLen);
-    var rows = 8;
-    var gap = 2;
-
-    function size(){
-      canvas.style.width = '';
-      canvas.style.height = '';
-      var w = canvas.parentElement.clientWidth || window.innerWidth - 200;
-      if(w < 100) w = 400;
-      canvas.width = w;
-      canvas.height = 40;
-    }
-    size();
-
-    function draw(){
-      bottomVizId = requestAnimationFrame(draw);
-      analyser.getByteFrequencyData(data);
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#0d0d0d';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      var barH = (canvas.height - 8 - gap * (rows - 1)) / rows;
-      if(barH < 2) barH = 2;
-      var halfLen = Math.floor(bufLen / 2);
-
-      for(var i = 0; i < rows; i++){
-        var lIdx = Math.floor((i / rows) * halfLen);
-        var rIdx = halfLen + Math.floor((i / rows) * (bufLen - halfLen));
-        if(lIdx >= halfLen) lIdx = halfLen - 1;
-        if(rIdx >= bufLen) rIdx = bufLen - 1;
-
-        var lVal = data[lIdx] / 255;
-        var rVal = data[rIdx] / 255;
-
-        var y = 4 + i * (barH + gap);
-        var lw = Math.max(1, lVal * (canvas.width / 2 - 4));
-        var rw = Math.max(1, rVal * (canvas.width / 2 - 4));
-
-        // Left bar: grows from left edge rightward
-        ctx.fillStyle = '#007acc';
-        ctx.fillRect(2, y, lw, barH);
-
-        // Right bar: grows from right edge leftward
-        ctx.fillStyle = '#1a8ad4';
-        ctx.fillRect(canvas.width - 2 - rw, y, rw, barH);
-      }
-
-      // Center line
-      ctx.fillStyle = '#2a2a2a';
-      ctx.fillRect(canvas.width / 2 - 1, 2, 2, canvas.height - 4);
-    }
-    draw();
-  }
-    draw();
-  }
-
-  function stopBottomViz(){
-    if(bottomVizId){ cancelAnimationFrame(bottomVizId); bottomVizId = null; }
-    if(panelViz){
-      var ctx = panelViz.getContext('2d');
-      if(ctx){ ctx.clearRect(0, 0, panelViz.width, panelViz.height); }
-    }
   }
 
   // ─── CD Player helpers ──────────────────────────────────────────────
@@ -629,7 +626,7 @@
     currentTrackIndex=index;var track=musicResults[index];
     if(!track.videoId)return;
     if(isPlaying){try{audioPlayer.pause();}catch(e){}
-    }else{stopVisualizer();stopBottomViz();}
+    }else{stopVisualizer();stopFooterViz();}
     nowPlaying.innerHTML='<div class="music-panel__loading"><span class="spinner"></span><span>Downloading...</span></div>';
     setCdLoading(true);
     showCdPlayer();
@@ -642,7 +639,8 @@
         audioPlayer.oncanplay=function(){
           resumeAudioCtx();
           startVisualizer();
-          startBottomViz();
+          startFooterViz();
+          startFooterViz();
           audioPlayer.play().then(function(){
             isPlaying=true;
             var title=track.trackName||'Unknown';
@@ -667,7 +665,8 @@
 
   function pauseTrack(){
     try{audioPlayer.pause();}catch(e){}
-    isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);stopBottomViz();
+    isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);
+    stopFooterViz();
   }
 
   function togglePlay(){
@@ -677,7 +676,7 @@
       initAudioGraph();
       resumeAudioCtx();
       startVisualizer();
-      startBottomViz();
+      startFooterViz();
       audioPlayer.play().then(function(){isPlaying=true;musicPlayBtn.textContent='\u23F8';renderMusicResults();setCdSpinning(true);}).catch(function(){console.warn('Play rejected (autoplay policy)');});
     }
   }
@@ -731,7 +730,7 @@
   audioPlayer.addEventListener('timeupdate',updateMusicProgress);
   audioPlayer.addEventListener('ended',function(){
     isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);
-    stopVisualizer();stopBottomViz();
+    stopVisualizer();stopFooterViz();
     var track=musicResults[currentTrackIndex];
     if(track&&track.videoId){
       fetch('/api/music/'+track.videoId,{method:'DELETE'}).catch(function(){});
@@ -739,7 +738,7 @@
   });
   audioPlayer.addEventListener('error',function(){
     isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);
-    stopVisualizer();stopBottomViz();
+    stopVisualizer();stopFooterViz();
     showMusicError('Playback failed - file may be corrupted or unsupported');
   });
   musicProgress.addEventListener('input',function(){if(audioPlayer.duration){audioPlayer.currentTime=(musicProgress.value/100)*audioPlayer.duration;}});
