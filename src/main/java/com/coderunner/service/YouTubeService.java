@@ -1,7 +1,6 @@
 package com.coderunner.service;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -211,23 +210,38 @@ public class YouTubeService {
     }
 
     public Path downloadAndSave(String videoId) throws Exception {
-        // Get download URL from RapidAPI
-        Map<String, Object> info = getDownloadInfo(videoId);
-        String dlUrl = (String) info.get("link");
-        if (dlUrl == null || dlUrl.isEmpty()) {
-            // Try alternative field names
-            dlUrl = (String) info.get("url");
-        }
-        if (dlUrl == null || dlUrl.isEmpty()) {
-            throw new RuntimeException("No download URL in API response: " + info);
-        }
-
-        // Ensure music directory exists
         Path musicDir = Paths.get("music");
         Files.createDirectories(musicDir);
-
-        // Download the MP3 file
         Path outPath = musicDir.resolve(videoId + ".mp3");
+
+        // Try primary: RapidAPI
+        try {
+            downloadFromRapidApi(videoId, outPath);
+            if (isValidMp3(outPath)) return outPath;
+            Files.deleteIfExists(outPath);
+        } catch (Exception e) {
+            // Fall through to fallback
+        }
+
+        // Try fallback: direct YouTube audio stream extraction
+        try {
+            outPath = musicDir.resolve(videoId + ".m4a");
+            downloadFromYouTubeDirect(videoId, outPath);
+            if (Files.size(outPath) > 1024) return outPath;
+            Files.deleteIfExists(outPath);
+        } catch (Exception e) {
+            // Fall through to error
+        }
+
+        throw new RuntimeException("All download methods failed for video " + videoId);
+    }
+
+    private void downloadFromRapidApi(String videoId, Path outPath) throws Exception {
+        Map<String, Object> info = getDownloadInfo(videoId);
+        String dlUrl = (String) info.get("link");
+        if (dlUrl == null || dlUrl.isEmpty()) dlUrl = (String) info.get("url");
+        if (dlUrl == null || dlUrl.isEmpty()) throw new RuntimeException("No download URL from RapidAPI");
+
         HttpRequest dlReq = HttpRequest.newBuilder()
             .uri(URI.create(dlUrl))
             .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
@@ -239,21 +253,90 @@ public class YouTubeService {
         try (InputStream in = dlRes.body()) {
             Files.copy(in, outPath, StandardCopyOption.REPLACE_EXISTING);
         }
+        if (dlRes.statusCode() != 200) throw new RuntimeException("RapidAPI download HTTP " + dlRes.statusCode());
+    }
 
-        int dlStatus = dlRes.statusCode();
-        if (dlStatus != 200) {
-            Files.deleteIfExists(outPath);
-            throw new RuntimeException("Download failed with HTTP " + dlStatus + " (RapidAPI link expired?)");
+    @SuppressWarnings("unchecked")
+    private void downloadFromYouTubeDirect(String videoId, Path outPath) throws Exception {
+        String pageUrl = "https://www.youtube.com/watch?v=" + videoId;
+
+        HttpRequest pageReq = HttpRequest.newBuilder()
+            .uri(URI.create(pageUrl))
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header("Accept-Language", "en-US,en;q=0.5")
+            .GET()
+            .build();
+
+        HttpResponse<String> pageRes = client.send(pageReq, HttpResponse.BodyHandlers.ofString());
+        String body = pageRes.body();
+
+        // Extract ytInitialPlayerResponse JSON
+        String marker = "ytInitialPlayerResponse";
+        int idx = body.indexOf(marker);
+        if (idx < 0) throw new RuntimeException("No ytInitialPlayerResponse found");
+
+        int start = body.indexOf('{', idx);
+        if (start < 0) throw new RuntimeException("No JSON start found");
+
+        int depth = 0, end = start;
+        for (int i = start; i < body.length(); i++) {
+            char c = body.charAt(i);
+            if (c == '{') depth++;
+            else if (c == '}') {
+                depth--;
+                if (depth == 0) { end = i; break; }
+            }
+        }
+        if (end <= start) throw new RuntimeException("Could not parse player response JSON");
+
+        String json = body.substring(start, end + 1);
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        Map<String, Object> root = mapper.readValue(json, Map.class);
+
+        Map<String, Object> streamingData = (Map<String, Object>) root.get("streamingData");
+        if (streamingData == null) throw new RuntimeException("No streamingData in player response");
+
+        List<Object> formats = (List<Object>) streamingData.get("adaptiveFormats");
+        if (formats == null) formats = (List<Object>) streamingData.get("formats");
+        if (formats == null) throw new RuntimeException("No formats found");
+
+        // Find best audio-only stream
+        String bestUrl = null;
+        int bestBitrate = -1;
+        for (Object fmtObj : formats) {
+            Map<String, Object> fmt = (Map<String, Object>) fmtObj;
+            String mimeType = (String) fmt.get("mimeType");
+            if (mimeType == null) continue;
+            // Only audio streams
+            if (mimeType.startsWith("audio/")) {
+                int bitrate = fmt.get("bitrate") instanceof Number ? ((Number) fmt.get("bitrate")).intValue() : 0;
+                String url = (String) fmt.get("url");
+                if (url != null && bitrate > bestBitrate) {
+                    bestBitrate = bitrate;
+                    bestUrl = url;
+                }
+            }
+            // If no audio-only formats found, try the combined format url
+            if (bestUrl == null && mimeType.startsWith("video/")) {
+                String url = (String) fmt.get("url");
+                if (url != null) bestUrl = url; // fallback to video with audio
+            }
         }
 
-        // Validate the downloaded file is actually an MP3
-        long fileSize = Files.size(outPath);
-        if (!isValidMp3(outPath)) {
-            Files.deleteIfExists(outPath);
-            throw new RuntimeException("Not a valid MP3 (" + fileSize + " bytes downloaded) — RapidAPI link expired");
-        }
+        if (bestUrl == null) throw new RuntimeException("No audio URL found");
 
-        return outPath;
+        HttpRequest audioReq = HttpRequest.newBuilder()
+            .uri(URI.create(bestUrl))
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header("Referer", "https://www.youtube.com/")
+            .GET()
+            .build();
+
+        HttpResponse<InputStream> audioRes = dlClient.send(audioReq, HttpResponse.BodyHandlers.ofInputStream());
+        try (InputStream in = audioRes.body()) {
+            Files.copy(in, outPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+        if (audioRes.statusCode() != 200) throw new RuntimeException("YouTube audio download HTTP " + audioRes.statusCode());
     }
 
     private boolean isValidMp3(Path path) {

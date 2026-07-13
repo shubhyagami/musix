@@ -72,12 +72,17 @@ public class MusicController {
     public ResponseEntity<Resource> stream(@PathVariable String videoId) {
         try {
             Path filePath = Path.of("music", videoId + ".mp3");
+            String contentType = "audio/mpeg";
             if (!Files.exists(filePath)) {
-                return ResponseEntity.notFound().build();
+                filePath = Path.of("music", videoId + ".m4a");
+                contentType = "audio/mp4";
+                if (!Files.exists(filePath)) {
+                    return ResponseEntity.notFound().build();
+                }
             }
             FileSystemResource resource = new FileSystemResource(filePath);
             return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType("audio/mpeg"))
+                .contentType(MediaType.parseMediaType(contentType))
                 .contentLength(resource.contentLength())
                 .header("Accept-Ranges", "bytes")
                 .body(resource);
@@ -90,6 +95,9 @@ public class MusicController {
     public ResponseEntity<?> delete(@PathVariable String videoId) {
         try {
             Path filePath = Path.of("music", videoId + ".mp3");
+            if (!Files.exists(filePath)) {
+                filePath = Path.of("music", videoId + ".m4a");
+            }
             if (Files.exists(filePath)) {
                 Files.delete(filePath);
                 return ResponseEntity.ok(Map.of("status", "deleted"));
