@@ -525,9 +525,8 @@
     var ctx = canvas.getContext('2d');
     var bufLen = analyser.frequencyBinCount;
     var data = new Uint8Array(bufLen);
-    var bars = 14;
-    var half = Math.floor(bars / 2);
-    var maxH = 36;
+    var rows = 8;
+    var gap = 2;
 
     function size(){
       canvas.style.width = '';
@@ -547,36 +546,38 @@
       ctx.fillStyle = '#0d0d0d';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      var barW = Math.max(2, (canvas.width / bars) * 0.6);
-      var gap = Math.max(1, (canvas.width / bars) * 0.4);
+      var barH = (canvas.height - 8 - gap * (rows - 1)) / rows;
+      if(barH < 2) barH = 2;
+      var halfLen = Math.floor(bufLen / 2);
 
-      for(var i = 0; i < half; i++){
-        var lIdx = i;
-        var rIdx = half + i;
-        if(rIdx >= bufLen) break;
+      for(var i = 0; i < rows; i++){
+        var lIdx = Math.floor((i / rows) * halfLen);
+        var rIdx = halfLen + Math.floor((i / rows) * (bufLen - halfLen));
+        if(lIdx >= halfLen) lIdx = halfLen - 1;
+        if(rIdx >= bufLen) rIdx = bufLen - 1;
 
         var lVal = data[lIdx] / 255;
         var rVal = data[rIdx] / 255;
-        var lh = Math.max(1, lVal * maxH);
-        var rh = Math.max(1, rVal * maxH);
 
-        // Left side: bars grow from left edge rightward
-        var lx = i * (barW + gap) + gap/2;
+        var y = 4 + i * (barH + gap);
+        var lw = Math.max(1, lVal * (canvas.width / 2 - 4));
+        var rw = Math.max(1, rVal * (canvas.width / 2 - 4));
+
+        // Left bar: grows from left edge rightward
         ctx.fillStyle = '#007acc';
-        ctx.fillRect(lx, canvas.height - 4 - lh, barW, lh);
+        ctx.fillRect(2, y, lw, barH);
 
-        // Right side: bars grow from right edge leftward
-        var rx = canvas.width - (i + 1) * (barW + gap) + gap/2;
+        // Right bar: grows from right edge leftward
         ctx.fillStyle = '#1a8ad4';
-        ctx.fillRect(rx, canvas.height - 4 - rh, barW, rh);
+        ctx.fillRect(canvas.width - 2 - rw, y, rw, barH);
       }
 
-      // Center dot
-      ctx.fillStyle = '#555';
-      ctx.beginPath();
-      ctx.arc(canvas.width / 2, canvas.height - 4, 2, 0, Math.PI * 2);
-      ctx.fill();
+      // Center line
+      ctx.fillStyle = '#2a2a2a';
+      ctx.fillRect(canvas.width / 2 - 1, 2, 2, canvas.height - 4);
     }
+    draw();
+  }
     draw();
   }
 
