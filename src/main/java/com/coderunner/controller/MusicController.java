@@ -5,7 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -68,19 +69,20 @@ public class MusicController {
     }
 
     @GetMapping("/stream/{videoId}")
-    public ResponseEntity<?> stream(@PathVariable String videoId) {
+    public ResponseEntity<Resource> stream(@PathVariable String videoId) {
         try {
             Path filePath = Path.of("music", videoId + ".mp3");
             if (!Files.exists(filePath)) {
                 return ResponseEntity.notFound().build();
             }
-            InputStreamResource resource = new InputStreamResource(Files.newInputStream(filePath));
+            FileSystemResource resource = new FileSystemResource(filePath);
             return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType("audio/mpeg"))
-                .contentLength(Files.size(filePath))
+                .contentLength(resource.contentLength())
+                .header("Accept-Ranges", "bytes")
                 .body(resource);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(500).body(null);
         }
     }
 

@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -26,6 +27,9 @@ import org.springframework.stereotype.Service;
 public class YouTubeService {
 
     private final HttpClient client = HttpClient.newHttpClient();
+    private final HttpClient dlClient = HttpClient.newBuilder()
+        .connectTimeout(Duration.ofSeconds(15))
+        .build();
 
     @Value("${rapidapi.key}")
     private String rapidApiKey;
@@ -215,11 +219,33 @@ public class YouTubeService {
             .GET()
             .build();
 
-        HttpResponse<InputStream> dlRes = client.send(dlReq, HttpResponse.BodyHandlers.ofInputStream());
+        HttpResponse<InputStream> dlRes = dlClient.send(dlReq, HttpResponse.BodyHandlers.ofInputStream());
         try (InputStream in = dlRes.body()) {
             Files.copy(in, outPath, StandardCopyOption.REPLACE_EXISTING);
         }
 
+        // Validate the downloaded file is actually an MP3
+        if (!isValidMp3(outPath)) {
+            Files.deleteIfExists(outPath);
+            throw new RuntimeException("Downloaded file is not a valid MP3 (RapidAPI link may have expired)");
+        }
+
         return outPath;
+    }
+
+    private boolean isValidMp3(Path path) {
+        try {
+            byte[] header = new byte[3];
+            try (InputStream in = Files.newInputStream(path)) {
+                int read = in.read(header);
+                if (read < 3) return false;
+            }
+            // MP3 can start with ID3 tag (ID3v2) or MPEG sync word (0xFF 0xFB / 0xFF 0xF3 / 0xFF 0xE3)
+            if (header[0] == 0x49 && header[1] == 0x44 && header[2] == 0x33) return true; // "ID3"
+            if (header[0] == (byte) 0xFF && (header[1] & 0xE0) == 0xE0) return true;       // MPEG sync
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

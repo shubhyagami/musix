@@ -613,10 +613,16 @@
   audioPlayer.addEventListener('timeupdate',updateMusicProgress);
   audioPlayer.addEventListener('ended',function(){
     isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);
+    stopVisualizer();
     var track=musicResults[currentTrackIndex];
     if(track&&track.videoId){
       fetch('/api/music/'+track.videoId,{method:'DELETE'}).catch(function(){});
     }
+  });
+  audioPlayer.addEventListener('error',function(){
+    isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);
+    stopVisualizer();
+    showMusicError('Playback failed - file may be corrupted or unsupported');
   });
   musicProgress.addEventListener('input',function(){if(audioPlayer.duration){audioPlayer.currentTime=(musicProgress.value/100)*audioPlayer.duration;}});
   musicVolume.addEventListener('input',function(){if(audioPlayer){audioPlayer.volume=parseFloat(musicVolume.value);}});
