@@ -32,6 +32,7 @@
   var surrDelay = null;
   var surrWetGain = null;
   var vizAnimId = null;
+  var bottomVizId = null;
   var eqBassVal = 0;
   var eqTrebleVal = 0;
 
@@ -98,6 +99,7 @@
   var cdProgress = document.getElementById('cdProgress');
   var cdTime = document.getElementById('cdTime');
   var cdToggle = document.getElementById('cdToggle');
+  var panelViz = document.getElementById('panelViz');
 
   // ─── Java class-to-import map ───────────────────────────────────────
   var JAVA_IMPORTS = {
@@ -406,7 +408,7 @@
 
   // ─── Music Player ───────────────────────────────────────────────────
   function openMusicPanel(){musicPanel.classList.remove('music-panel--closed');musicPanel.style.width=musicPanelWidth+'px';musicBtn.classList.add('activity-bar__btn--active');musicPanelOpen=true;}
-  function closeMusicPanel(){musicPanel.classList.add('music-panel--closed');musicBtn.classList.remove('activity-bar__btn--active');musicPanelOpen=false;pauseTrack();stopVisualizer();}
+  function closeMusicPanel(){musicPanel.classList.add('music-panel--closed');musicBtn.classList.remove('activity-bar__btn--active');musicPanelOpen=false;pauseTrack();stopVisualizer();stopBottomViz();}
   function toggleMusicPanel(){if(musicPanelOpen)closeMusicPanel();else{closeAiPanel();openMusicPanel();}}
 
   function searchMusic(query){
@@ -437,6 +439,10 @@
     if(audioCtx) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 128;
+    analyser.smoothingTimeConstant = 0.8;
+
     bassFilter = audioCtx.createBiquadFilter();
     bassFilter.type = 'lowshelf';
     bassFilter.frequency.value = 200;
@@ -447,7 +453,6 @@
     trebleFilter.frequency.value = 3000;
     trebleFilter.gain.value = 0;
 
-    // Surround: short delay mixed as wet signal for spaciousness
     surrDelay = audioCtx.createDelay(0.1);
     surrDelay.delayTime.value = 0.03;
     surrWetGain = audioCtx.createGain();
@@ -456,7 +461,8 @@
     sourceNode = audioCtx.createMediaElementSource(audioPlayer);
     sourceNode.connect(bassFilter);
     bassFilter.connect(trebleFilter);
-    trebleFilter.connect(audioCtx.destination);
+    trebleFilter.connect(analyser);
+    analyser.connect(audioCtx.destination);
     trebleFilter.connect(surrDelay);
     surrDelay.connect(surrWetGain);
     surrWetGain.connect(audioCtx.destination);
@@ -511,6 +517,69 @@
     if(surrWetGain) surrWetGain.gain.value = surroundEnabled ? 0.35 : 0;
   }
 
+  // ─── Bottom panel audio visualizer ────────────────────────────────
+  function startBottomViz(){
+    stopBottomViz();
+    if(!panelViz || !analyser) return;
+    var canvas = panelViz;
+    var ctx = canvas.getContext('2d');
+    var parent = canvas.parentElement;
+    var bufLen = analyser.frequencyBinCount;
+    var data = new Uint8Array(bufLen);
+    var bars = 14;
+    var half = Math.floor(bars / 2);
+
+    function resize(){
+      canvas.width = parent.clientWidth;
+      canvas.height = parent.clientHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function draw(){
+      bottomVizId = requestAnimationFrame(draw);
+      analyser.getByteFrequencyData(data);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      var barW = (canvas.width / bars) * 0.7;
+      var gap = (canvas.width / bars) * 0.3;
+      var maxH = canvas.height - 4;
+
+      for(var i = 0; i < half; i++){
+        var lIdx = i;
+        var rIdx = half + i;
+        if(rIdx >= bufLen) break;
+
+        var lVal = data[lIdx] / 255;
+        var rVal = data[rIdx] / 255;
+
+        // Left side: bars grow from left edge rightward
+        var lx = i * (barW + gap) + gap/2;
+        var lh = lVal * maxH;
+        ctx.fillStyle = '#007acc';
+        ctx.fillRect(lx, canvas.height - 2 - lh, barW, lh);
+
+        // Right side: bars grow from right edge leftward
+        var rx = canvas.width - (i + 1) * (barW + gap) + gap/2;
+        var rh = rVal * maxH;
+        ctx.fillRect(rx, canvas.height - 2 - rh, barW, rh);
+      }
+
+      // Center gap indicator
+      ctx.fillStyle = '#333';
+      ctx.fillRect(canvas.width/2 - 1, canvas.height - 6, 2, 4);
+    }
+    draw();
+  }
+
+  function stopBottomViz(){
+    if(bottomVizId){ cancelAnimationFrame(bottomVizId); bottomVizId = null; }
+    if(panelViz){
+      var ctx = panelViz.getContext('2d');
+      if(ctx) ctx.clearRect(0, 0, panelViz.width, panelViz.height);
+    }
+  }
+
   // ─── CD Player helpers ──────────────────────────────────────────────
   function showCdPlayer(){cdPlayer.classList.remove('cd-player--hidden');}
 
@@ -551,7 +620,7 @@
     currentTrackIndex=index;var track=musicResults[index];
     if(!track.videoId)return;
     if(isPlaying){try{audioPlayer.pause();}catch(e){}
-    }else{stopVisualizer();}
+    }else{stopVisualizer();stopBottomViz();}
     nowPlaying.innerHTML='<div class="music-panel__loading"><span class="spinner"></span><span>Downloading...</span></div>';
     setCdLoading(true);
     showCdPlayer();
@@ -564,6 +633,7 @@
         audioPlayer.oncanplay=function(){
           resumeAudioCtx();
           startVisualizer();
+          startBottomViz();
           audioPlayer.play().then(function(){
             isPlaying=true;
             var title=track.trackName||'Unknown';
@@ -588,7 +658,7 @@
 
   function pauseTrack(){
     try{audioPlayer.pause();}catch(e){}
-    isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);
+    isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);stopBottomViz();
   }
 
   function togglePlay(){
@@ -598,6 +668,7 @@
       initAudioGraph();
       resumeAudioCtx();
       startVisualizer();
+      startBottomViz();
       audioPlayer.play().then(function(){isPlaying=true;musicPlayBtn.textContent='\u23F8';renderMusicResults();setCdSpinning(true);}).catch(function(){console.warn('Play rejected (autoplay policy)');});
     }
   }
@@ -651,7 +722,7 @@
   audioPlayer.addEventListener('timeupdate',updateMusicProgress);
   audioPlayer.addEventListener('ended',function(){
     isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);
-    stopVisualizer();
+    stopVisualizer();stopBottomViz();
     var track=musicResults[currentTrackIndex];
     if(track&&track.videoId){
       fetch('/api/music/'+track.videoId,{method:'DELETE'}).catch(function(){});
@@ -659,7 +730,7 @@
   });
   audioPlayer.addEventListener('error',function(){
     isPlaying=false;musicPlayBtn.textContent='\u25B6';renderMusicResults();setCdSpinning(false);
-    stopVisualizer();
+    stopVisualizer();stopBottomViz();
     showMusicError('Playback failed - file may be corrupted or unsupported');
   });
   musicProgress.addEventListener('input',function(){if(audioPlayer.duration){audioPlayer.currentTime=(musicProgress.value/100)*audioPlayer.duration;}});
