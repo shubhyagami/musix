@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: musix
+    env: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: NV_API_KEY
+        sync: false
+      - key: RAPIDAPI_KEY
+        sync: false

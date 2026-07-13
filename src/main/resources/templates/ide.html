@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Runner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/ide.css">
+</head>
+<body>
+    <div class="ide">
+        <!-- Title Bar -->
+        <header class="title-bar">
+            <div class="title-bar__traffic">
+                <span class="title-bar__dot title-bar__dot--red"></span>
+                <span class="title-bar__dot title-bar__dot--yellow"></span>
+                <span class="title-bar__dot title-bar__dot--green"></span>
+            </div>
+            <div class="title-bar__project">
+                <span class="title-bar__project-icon">C</span>
+                <span class="title-bar__project-name">Code Runner</span>
+            </div>
+            <div class="title-bar__center" id="titleFileName">Main.java — Code Runner</div>
+            <div class="title-bar__actions">
+                <button class="title-bar__btn" title="Settings">&#9881;</button>
+                <button class="title-bar__btn title-bar__btn--run" id="runBtn" title="Run Code (Ctrl+Enter)">
+                    <span>&#9654;</span><span>Run</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="ide__main">
+            <!-- Activity Bar -->
+            <nav class="activity-bar">
+                <button class="activity-bar__btn activity-bar__btn--active" title="Explorer">&#128193;</button>
+                <button class="activity-bar__btn" title="Search">&#128270;</button>
+                <button class="activity-bar__btn" id="aiBtn" title="AI Feedback">&#129302;</button>
+                <button class="activity-bar__btn" id="musicBtn" title="Music Player">&#127926;</button>
+                <div class="activity-bar__spacer"></div>
+                <button class="activity-bar__btn" title="Settings">&#9881;</button>
+            </nav>
+
+            <!-- Explorer Sidebar -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar__header">
+                    <span>Explorer</span>
+                    <div class="sidebar__header-actions">
+                        <button class="sidebar__header-btn" id="newFileBtn" title="New File">+</button>
+                        <button class="sidebar__header-btn" id="collapseBtn" title="Collapse All">&#9660;</button>
+                    </div>
+                </div>
+                <div class="sidebar__content" id="sidebarContent">
+                    <ul class="tree" id="fileTree"></ul>
+                </div>
+            </aside>
+
+            <!-- Editor Area -->
+            <div class="editor-area">
+                <!-- Editor Tabs -->
+                <div class="editor-tabs" id="editorTabs"></div>
+
+                <!-- Editor Content -->
+                <div class="editor-content" id="editorContainer">
+                    <div id="emptyState" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:14px;flex-direction:column;gap:8px;">
+                        <span style="font-size:32px;">&#128193;</span>
+                        <span>Select a file from the explorer</span>
+                        <span style="font-size:12px;opacity:0.6;">or create a new file to start coding</span>
+                    </div>
+                </div>
+
+                <!-- Bottom Panel -->
+                <div class="panel-container">
+                    <div class="panel-tabs">
+                        <button class="panel-tab panel-tab--active"><span>Output</span></button>
+                        <div class="panel-tabs__actions">
+                            <button class="panel-tabs__btn" id="clearOutputBtn" title="Clear Output">&#128465;</button>
+                        </div>
+                    </div>
+                    <div class="panel-content">
+                        <pre class="panel-content__pre" id="output">&#9654; Click "Run" to execute your Java code</pre>
+                    </div>
+                    <div class="stdin">
+                        <div class="stdin__label"><span>&#9000;</span><span>Stdin</span></div>
+                        <textarea class="stdin__textarea" id="stdinInput" placeholder="Optional input for your program..." rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Panel -->
+            <div class="ai-panel ai-panel--closed" id="aiPanel">
+                <div class="ai-panel__drag" id="aiDragHandle"></div>
+                <div class="ai-panel__header">
+                    <span class="ai-panel__title">&#129302; AI</span>
+                    <div class="ai-panel__header-actions">
+                        <button class="ai-panel__mode-btn" id="aiModeBtn" title="Toggle Chat/Feedback">&#128172;</button>
+                        <button class="ai-panel__btn" id="aiCloseBtn" title="Close">&#10005;</button>
+                    </div>
+                </div>
+                <div class="ai-panel__toolbar">
+                    <span id="aiStatus">Feedback mode</span>
+                </div>
+                <!-- Feedback mode -->
+                <div class="ai-panel__content" id="aiContent">
+                    <div class="ai-panel__placeholder" id="aiPlaceholder">
+                        <span style="font-size:32px;">&#129302;</span>
+                        <span>Run your code to get AI feedback</span>
+                        <span style="font-size:12px;opacity:0.6;">Time complexity, better approaches &amp; error fixes</span>
+                    </div>
+                </div>
+                <div class="ai-panel__footer" id="aiFooter">
+                    <button class="ai-panel__btn" id="aiCloseFooterBtn">Close Panel</button>
+                </div>
+                <!-- Chat mode (hidden by default) -->
+                <div class="ai-panel__chat" id="aiChatPanel" style="display:none;">
+                    <div class="ai-panel__chat-messages" id="aiChatMessages">
+                        <div class="chat-msg chat-msg--assistant">
+                            <div class="chat-msg__bubble">Hello! I'm your AI coding assistant. Ask me anything about your code.</div>
+                        </div>
+                    </div>
+                    <div class="ai-panel__chat-input-row">
+                        <textarea class="ai-panel__chat-input" id="aiChatInput" placeholder="Ask about your code..." rows="2"></textarea>
+                        <button class="ai-panel__chat-send" id="aiChatSendBtn">&#10148;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Music Panel -->
+            <div class="music-panel music-panel--closed" id="musicPanel">
+                <div class="music-panel__drag" id="musicDragHandle"></div>
+                <div class="music-panel__header">
+                    <span class="music-panel__title">&#127926; Music Player</span>
+                    <div class="music-panel__header-actions">
+                        <button class="music-panel__btn" id="musicCloseBtn" title="Close">&#10005;</button>
+                    </div>
+                </div>
+                <div class="music-panel__toolbar">
+                    <div class="music-panel__search">
+                        <input type="text" class="music-panel__search-input" id="musicSearchInput" placeholder="Search songs, artists..." />
+                        <button class="music-panel__search-btn" id="musicSearchBtn">&#128269;</button>
+                    </div>
+                </div>
+                <div class="music-panel__content" id="musicContent">
+                    <div class="music-panel__placeholder">
+                        <span style="font-size:32px;">&#127926;</span>
+                        <span>Search for music to play</span>
+                        <span style="font-size:12px;opacity:0.6;">Powered by iTunes Search API</span>
+                    </div>
+                </div>
+                <div class="music-panel__player" id="musicPlayer">
+                    <!-- Visualizer -->
+                    <div class="music-panel__viz-container">
+                        <canvas class="music-panel__viz" id="musicViz" width="336" height="60"></canvas>
+                    </div>
+                    <div class="music-panel__now-playing" id="nowPlaying">
+                        <span class="music-panel__np-info">No track selected</span>
+                    </div>
+                    <div class="music-panel__controls">
+                        <button class="music-panel__ctrl-btn" id="musicPlayBtn" title="Play/Pause">&#9654;</button>
+                        <input type="range" class="music-panel__progress" id="musicProgress" min="0" max="100" value="0" />
+                        <span class="music-panel__time" id="musicTime">0:00 / 0:00</span>
+                        <input type="range" class="music-panel__volume" id="musicVolume" min="0" max="1" step="0.05" value="0.5" />
+                    </div>
+                    <!-- Equalizer + Surround -->
+                    <div class="music-panel__eq">
+                        <div class="music-panel__eq-slider">
+                            <label class="music-panel__eq-label">Bass</label>
+                            <input type="range" class="music-panel__eq-range" id="eqBass" min="-20" max="20" value="0" step="0.5" />
+                            <span class="music-panel__eq-value" id="eqBassVal">0dB</span>
+                        </div>
+                        <div class="music-panel__eq-slider">
+                            <label class="music-panel__eq-label">Treble</label>
+                            <input type="range" class="music-panel__eq-range" id="eqTreble" min="-20" max="20" value="0" step="0.5" />
+                            <span class="music-panel__eq-value" id="eqTrebleVal">0dB</span>
+                        </div>
+                        <button class="music-panel__surround-btn" id="surroundBtn" title="Surround Sound">&#127911;</button>
+                    </div>
+                    <audio id="audioPlayer" style="display:none"></audio>
+                </div>
+            </div>
+        </div>
+
+        <!-- Context Menu -->
+        <div class="context-menu" id="contextMenu">
+            <div class="context-menu__item" id="ctxRename">&#9998; Rename</div>
+            <div class="context-menu__divider"></div>
+            <div class="context-menu__item context-menu__item--danger" id="ctxDelete">&#128465; Delete</div>
+        </div>
+
+        <!-- CD Player -->
+        <div class="cd-player cd-player--min" id="cdPlayer">
+            <div class="cd-player__disc" id="cdDisc">
+                <img class="cd-player__art" id="cdArt" src="" alt="Now Playing" />
+                <div class="cd-player__hole"></div>
+            </div>
+            <div class="cd-player__body" id="cdBody">
+                <div class="cd-player__info" id="cdInfo">Not playing</div>
+                <div class="cd-player__controls">
+                    <button class="cd-player__btn" id="cdPrevBtn">&#9198;</button>
+                    <button class="cd-player__btn cd-player__btn--play" id="cdPlayBtn">&#9654;</button>
+                    <button class="cd-player__btn" id="cdNextBtn">&#9197;</button>
+                </div>
+                <div class="cd-player__progress-row">
+                    <input type="range" class="cd-player__progress" id="cdProgress" min="0" max="100" value="0" />
+                    <span class="cd-player__time" id="cdTime">0:00 / 0:00</span>
+                </div>
+            </div>
+            <button class="cd-player__toggle" id="cdToggle" title="Toggle">&#9650;</button>
+        </div>
+
+        <!-- Status Bar -->
+        <footer class="status-bar">
+            <div class="status-bar__section">
+                <span class="status-bar__item">
+                    <span class="status-bar__icon">&#128056;</span>
+                    <span>main</span>
+                </span>
+            </div>
+            <div class="status-bar__center"></div>
+            <div class="status-bar__right">
+                <span class="status-bar__item">Ln 1, Col 1</span>
+                <span class="status-bar__item">Spaces: 2</span>
+                <span class="status-bar__item">UTF-8</span>
+                <span class="status-bar__item">Java</span>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js"></script>
+    <script src="/js/ide.js"></script>
+</body>
+</html>

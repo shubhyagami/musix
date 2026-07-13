@@ -1,0 +1,9 @@
+target/
+data/
+music/
+.mvn/
+mvnw
+mvnw.cmd
+.git/
+.gitignore
+*.md

@@ -1,0 +1,8 @@
+target/
+data/
+music/
+.mvn/
+.vscode/
+*.iml
+.idea/
+*.log
