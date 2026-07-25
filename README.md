@@ -60,4 +60,44 @@
 
 ---
 
-**Maintained by [shubhyagami](https://github.com/shubhyagami) · TVA Temporal Engineering**
+## 🕰️ Contributing (TVA Temporal Guidelines)
+
+Welcome, Variant Developer! The **Time Variance Authority** (TVA) oversees all timelines – including the codebase of musix. To keep the Sacred Timeline intact, please follow these temporal protocols before submitting a pull request.
+
+### 🚨 Nexus Events We Accept
+
+- **Bug fixes** – any timeline anomaly (e.g., memory leaks, search glitches) that threatens the flow of music.
+- **New features** – as long as they don’t create a branching reality (i.e., break existing functionality).
+- **Performance improvements** – faster streams mean fewer temporal paradoxes.
+
+### ❌ Nexus Events That Get Pruned
+
+- **Breaking changes** without prior discussion. (No one wants a Kang variant of your code.)
+- **Unrelated commits** – keep your changes inside the same temporal coordinate.
+- **Missing tests** – every new function must be tested, or the TVA will reset you.
+
+### 🔄 Temporal Workflow
+
+1. **File a Nexus Ticket** – Open an issue describing the timeline deviation you want to fix or add.
+2. **Synchronize your fork** – Pull the latest from the main timeline (`main` branch).
+3. **Create a feature branch** – Name it after the temporal anomaly, e.g., `fix/playlist-sync-2026` or `feat/voice-search-nexus`.
+4. **Commit in the present tense** – Your commit messages must be clear enough for a Minuteman to read.
+5. **Submit a Pull Request** – Tag the TVA (the maintainer) and describe how your change preserves the Sacred Timeline.
+6. **Wait for Temporal Review** – The TVA will inspect your code. If approved, it gets canonized. If rejected, it’s pruned without mercy.
+
+### 🛡️ Code of Conduct
+
+All contributors must:
+- Respect the timeline (no untested edge cases).
+- Use Maven’s build system – don’t introduce new build tools without prior approval.
+- Keep the README up to date – every PR should update relevant documentation.
+
+### 📜 License
+
+By contributing, you agree that your code will be licensed under the same MIT License as the main project. The TVA does not negotiate licensing terms.
+
+**Ready to shape the future of music?** Fork the repo, put on your Temporal Suit, and make some noise!
+
+---
+
+**Maintained by [shubhyagami](https://github.com/shubhyagami) · TVA
