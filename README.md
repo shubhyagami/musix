@@ -62,37 +62,33 @@
 
 ## 🕰️ Contributing (TVA Temporal Guidelines)
 
-Welcome, Variant Deve
+Welcome, Variant Developer! The Sacred Timeline of musix depends on contributors like you. Before you open a pull request, heed the words of the Time Keepers:
 
----
+### 📜 The Sacred Protocol
 
-## 🚀 Temporal Roadmap
+1. **Detect & Document** – File an issue before branching. Describe the variant (bug), the timeline (version), and your intended prune.
+2. **Branch with Purpose** – Name your branch after the era you're improving:
+   - `sacred/feat-playlist-vault` for new features
+   - `sacred/fix-stream-prune` for bug fixes
+   - `sacred/chrono-deps` for dependency updates
+3. **Prune Cleanly** – Run `mvn verify` locally. If the Sacred Timeline fails to compile, the Miss Minutes will laugh at you.
+4. **Sign the Variant Log** – Every commit message must begin with one of:
+   - `[FEAT]` A new branch sprouts from the timeline.
+   - `[FIX]` A pruned deviation has been restored.
+   - `[DOCS]` Chronological records updated.
+   - `[REFACTOR]` A nexus event, no behavior change.
+5. **Recuse Yourself** – Never commit directly to `main`. Only Miss Minutes holds the Master Script.
 
-The TVA has approved the following timeline for musix. Check off features as they are pruned from the Sacred Timeline.
+### ⚖️ Code of Conduct
 
-- [ ] **Version 2.0 – Nexus Event**  
-  - Collaborative real-time playlists (multiple users editing simultaneously).  
-  - Offline mode with sync-on-connect.  
-  - AI-generated “mood radio” based on your listening history.
+We do not prune people, only bad code. Be kind. Be patient. Remember: every contributor was once a Variant who just wanted their PR merged.
 
-- [ ] **Version 2.1 – Variant Tracks**  
-  - Cross-platform desktop client (Windows, macOS, Linux).  
-  - Integration with Spotify & Apple Music imports.  
-  - Lyrics display (synced and searchable).
+### 🏆 Hall of Variants
 
-- [ ] **Version 2.2 – Time Slicer**  
-  - “Time capsule” playlists that auto-curate songs from a chosen decade.  
-  - Podcast & audiobook support (beta).  
-  - Smart shuffle that respects genre transitions.
+Top contributors are immortalized in `CREDITS.md` and granted the title of **Timeline Keeper**. Submit 5 merged PRs to be eligible.
 
-- [ ] **Version 3.0 – The End of Time**  
-  - Decentralized peer-to-peer streaming (no central server).  
-  - Voice-controlled playback (“Hey musix, play something upbeat”).  
-  - Full API for third‑party plugin development.
+### 🔒 Security Variants
 
-- [ ] **Long‑term: Prune the Branch**  
-  - Spatial audio rendering (Dolby Atmos support).  
-  - Music discovery via collaborative filtering with neural networks.  
-  - Integration with wearable devices for tempo‑adaptive workout playlists.
+Found a vulnerability? **Do NOT open a public issue.** Email `sacred-timeline@musix.tva` immediately. The TVA will investigate before any branched exploits can spread.
 
-*Want to see a feature on this timeline? Submit a Variant Request via the Issues tab!*
+> *"For all time. Always."* — TVA Motto
