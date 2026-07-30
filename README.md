@@ -54,6 +54,13 @@
 
 ## Changelog
 
+### 2026-07-31
+- Added **offline playback** support – download songs and playlists for listening without an internet connection.
+- Introduced **collaborative playlists** – invite friends to add, remove, or reorder tracks in real time.
+- Revamped **mobile responsive UI** – improved touch controls and gesture support for iOS and Android browsers.
+- Optimised **database queries** – reduced average search latency by 30% for libraries with 100k+ songs.
+- Fixed **album art caching** issue that caused broken thumbnails on slow networks.
+
 ### 2026-07-30
 - Added **adaptive playlist recommendations** based on listening history (beta).
 - Improved **search indexing** – results now appear in under 100ms for libraries up to 50k songs.
@@ -65,6 +72,19 @@
 - Fixed memory leak in the streaming buffer when skipping tracks rapidly.
 - Improved search performance for large libraries (10k+ songs).
 - Updated dependencies to latest stable versions.
+
+## 🗺️ Roadmap
+
+What’s next for musix? Here are the features we’re actively working on:
+
+- **AI Playlist Generator** – Describe your mood (“rainy morning jazz”) and let musix curate the perfect mix.
+- **Spotify / Apple Music Sync** – Import your existing libraries and playlists from third‑party services.
+- **Audio Visualiser** – Real‑time waveform and spectrum display for the desktop version.
+- **Multi‑language Support** – Localise the interface for 10+ languages.
+- **Podcast & Audiobook Support** – Expand beyond music with spoken‑word content.
+- **Community Playlists** – Share and discover playlists made by other musix users.
+
+> *Have an idea? Open an issue on GitHub or join our community discussions.*
 
 ## 📊 musix by the Numbers
 
@@ -83,27 +103,3 @@
 
 ![Java](https://img.shields.io/badge/Backend-Java%2017-%23ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Framework-Spring%20Boot%203.3-%236DB33F?logo=springboot&logoColor=white)
-![Maven](https://img.shields.io/badge/Build-Maven-%23C71A36?logo=apachemaven&logoColor=white)
-![Thymeleaf](https://img.shields.io/badge/Templating-Thymeleaf-%23005F0F?logo=thymeleaf&logoColor=white)
-![H2](https://img.shields.io/badge/Database-H2%20(in--memory)-%23007396?logo=h2&logoColor=white)
-
-**Architecture overview:** musix follows a classic MVC pattern with a RESTful API layer. The core streaming engine uses a non‑blocking I/O buffer to minimise latency. Playlists are stored as lightweight JSON documents for easy export/import. The adaptive tempo learner runs as a scheduled background task, updating user profiles every hour.
-
-## 🕰️ Contributing (TVA Temporal Guidelines)
-
-Welcome, Variant Developer! The Sacred Timeline of musix depends on contributors like you. Before you open a pull request, heed the words of the Time Keepers:
-
-### 📜 The Sacred Protocol
-
-1. **Detect & Document** – File an issue before branching. Describe the variant (bug), the timeline (version), and your intended prune.
-2. **Branch with Purpose** – Name your branch after the era you're improving:
-   - `sacred/feat-playlist-vault` for new features
-   - `sacred/fix-stream-prune` for bug fixes
-   - `sacred/chrono-deps` for dependency updates
-3. **Prune Cleanly** – Run `mvn verify` locally. If the Sacred Timeline fails to compile, the Miss Minutes will laugh at you.
-4. **Sign the Variant Log** – Every commit message must begin with one of:
-   - `[FEAT]` A new branch sprouts from the timeline.
-   - `[FIX]` A pruned deviation has been restored.
-   - `[DOCS]` Chronological records updated.
-   - `[REFACTOR]` A nexus event, no behavior change.
-5. **Recuse Yourself** – Never commit directly to `main`. Only Miss Min
