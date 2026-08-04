@@ -55,39 +55,53 @@ Whether you're crossfading 320kbps tracks or driving real-time collaborative edi
 
 ## Pro Tips
 
-- **Smart Search** – Use `artist: "Radiohead"` or `year: 1997` in the search bar to filter results instantly.
-- **Playlist Sync** – Export your playlists to JSON and share them with friends. Import works too!
-- **Dark Mode** – Toggle it from the settings menu to save battery on late‑night listening sessions.
+- **S
 
-## Weekly Highlight
+---
 
-**2026‑07‑25** – This week’s most added song is “Blinding Lights” by The Weeknd (again!), and the longest playlist in the system now clocks in at 14 hours and 23 minutes. Can you beat it?
+## 🕰️ Contributing (TVA‑Style)
 
-## 📊 Project Stats
+Welcome, Variant! You’ve stumbled upon the **Sacred Timeline of musix**. The Time Variance Authority (TVA) oversees all pull requests, branches, and commits to ensure the timeline remains uncorrupted. Before you prune anything, please review our guidelines.
 
-| Metric | Value |
-|--------|-------|
-| 🎶 Total songs indexed | 142,387 |
-| 📁 Playlists created | 8,921 |
-| 👥 Active users this month | 2,340 |
-| ⏱️ Average search response time | 87 ms |
-| 🧑‍💻 Lines of Java code | 67,504 |
-| 🌐 API endpoints | 34 |
-| 🔄 Commits since v1.0.0 | 1,247 |
-| 🚀 Uptime (last 30 days) | 99.97% |
-| 🎛️ TARE Peak Concurrent Streams | 5,120 |
+### 🔧 How to Contribute
 
-> *These numbers are updated daily. Want to see more? Check the `/metrics` endpoint.*
+1. **File a Nexus Event**  
+   If you spot a bug or have an idea, open an Issue. The TVA will assign a Minuteman to assess its threat to the timeline.
 
-## Changelog
+2. **Create a New Branch from the Sacred Timeline**  
+   ```bash
+   git checkout -b feature/your-awesome-idea
+   ```  
+   *Branch names must not contain nexus events (e.g., no `fix-everything`).*
 
-### 2026-08-03
-- Added **real-time collaborative editing** – multiple users can now edit the same playlist simultaneously with conflict resolution.
-- Introduced **AI-generated playlist descriptions** – each collaborative playlist gets a short, context‑aware summary based on its tracks.
-- Implemented **WebSocket fallback** for browsers that don’t support native WebSocket – automatic long‑polling fallback ensures seamless collaboration.
-- Fixed **search autocomplete** lag when typing fast on mobile devices.
-- Optimised **image compression** for album art – average thumbnail size reduced by 40% without quality loss.
-- Updated **Logback** to 1.5.0 to resolve a rare memory leak in logging.
-- **TARE Refactor**: Engine core upgraded to support lock-free concurrent audio streams, pushing sustained throughput up by 22%.
+3. **Make Your Changes – No TemPad Required**  
+   - Follow the existing code style (we use EditorConfig and Checkstyle).
+   - Write tests – the TVA’s **Time-Keepers** will review every assertion.
+   - Keep commits atomic. A single commit should not cause a multiversal war.
 
-### 2026-07-3
+4. **Submit a Pull Request**  
+   - Target the `main` branch (the only timeline that matters).
+   - In the PR description, explain how your change aligns with the **Sacred Timeline** and does not create a branch reality.
+   - Tag at least one TVA agent (maintainer) for review.
+
+### ⚠️ Pruning Rules
+
+The TVA reserves the right to **prune** any contribution that:
+- Introduces bugs that could collapse the timeline.
+- Violates the **MIT License** (we’re not into nexus events).
+- Is not accompanied by tests or documentation (reset the timeline!).
+
+### 🕵️‍♂️ Agent Roles
+
+- **Minutemen** – Reviewers who patrol the codebase.
+- **Time-Keepers** – Core maintainers who decide the fate of PRs.
+- **Miss Minutes** – Our friendly bot that reminds you of deadlines and guidelines.
+
+### 🎵 Musical Nexus
+
+Every approved PR will be immortalised in the **musix Hall of Variants** (our `CONTRIBUTORS.md` file). Plus, you’ll earn a **TVA‑branded playlist badge** on your profile (coming soon).
+
+Ready to reshape the timeline? Fork, clone, and let the music flow across all realities.  
+
+**For the Sacred Timeline!**  
+— The TVA Temporal Engineering Team
