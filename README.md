@@ -53,11 +53,22 @@ At the heart of musix lies the bespoke **Temporal Audio Routing Engine (TARE)**.
 
 Whether you're crossfading 320kbps tracks or driving real-time collaborative edits over WebSockets, the engine maintains sub-10ms latency without breaking a sweat.
 
+## Weekly Highlight
+
+**This Week's Sonic Stat** – Over **84,000** songs have been indexed across all user libraries, with an average playlist length of 23 tracks. The most popular genre among contributors is *Synthwave*, followed closely by *Lofi Hip-Hop*.
+
 ## Pro Tips
 
-- **S
+- **Sync Across Devices** – Use the `--sync` flag to enable real-time collaborative playlist editing across multiple clients. Perfect for road trips or shared listening sessions.
+- **Keyboard Shortcuts** – Hit `Space` to play/pause, `j` to skip forward, `k` to skip backward, and `s` to toggle shuffle. No mouse required.
+- **Offline Mode** – Pre-cache your top 50 tracks with `--cache-limit 50` so you never miss a beat even when the Wi‑Fi drops.
 
----
+## Changelog (2026-08-06)
+
+- **New Feature:** Added `--export-playlist` command to export any playlist as M3U or JSON.
+- **Improvement:** Reduced memory footprint of TARE decoder by 12% when handling large libraries.
+- **Bug Fix:** Resolved an issue where the progress bar would flicker during crossfade transitions.
+- **Docs:** Updated the API reference with WebSocket endpoint descriptions for collaborative editing.
 
 ## 🕰️ Contributing (TVA‑Style)
 
@@ -80,28 +91,17 @@ Welcome, Variant! You’ve stumbled upon the **Sacred Timeline of musix**. The T
    - Keep commits atomic. A single commit should not cause a multiversal war.
 
 4. **Submit a Pull Request**  
-   - Target the `main` branch (the only timeline that matters).
-   - In the PR description, explain how your change aligns with the **Sacred Timeline** and does not create a branch reality.
-   - Tag at least one TVA agent (maintainer) for review.
+   - Target the `main` branch – only the Sacred Timeline is accepted.
+   - Provide a clear description of what your PR changes and why.
+   - Add a changelog entry under the next release date.
 
-### ⚠️ Pruning Rules
+5. **Await Judgment**  
+   The TVA will review your PR. If approved, your code will be merged into the timeline. If not, you’ll receive a friendly variant reset (and suggestions for improvement).
 
-The TVA reserves the right to **prune** any contribution that:
-- Introduces bugs that could collapse the timeline.
-- Violates the **MIT License** (we’re not into nexus events).
-- Is not accompanied by tests or documentation (reset the timeline!).
+### 📜 Code of Conduct
 
-### 🕵️‍♂️ Agent Roles
+Be excellent to each other. No timeline tampering, no Loki-style mischief, and always respect the sacred timeline’s coding standards.
 
-- **Minutemen** – Reviewers who patrol the codebase.
-- **Time-Keepers** – Core maintainers who decide the fate of PRs.
-- **Miss Minutes** – Our friendly bot that reminds you of deadlines and guidelines.
+---
 
-### 🎵 Musical Nexus
-
-Every approved PR will be immortalised in the **musix Hall of Variants** (our `CONTRIBUTORS.md` file). Plus, you’ll earn a **TVA‑branded playlist badge** on your profile (coming soon).
-
-Ready to reshape the timeline? Fork, clone, and let the music flow across all realities.  
-
-**For the Sacred Timeline!**  
-— The TVA Temporal Engineering Team
+*Happy listening, Variant!* 🎧
