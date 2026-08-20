@@ -1,18 +1,19 @@
 # 🎵 musix
 
-A Java-based music streaming and playlist manager.
+A Java-based music streaming and playlist manager built around a low-latency custom audio engine.
 
 [![Java](https://img.shields.io/badge/Java-17%2B-blue)](https://openjdk.org/)
 [![Build](https://img.shields.io/badge/Build-Maven-brightgreen)](pom.xml)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![Release](https://img.shields.io/badge/Release-v1.0.0-blueviolet)](https://github.com/shubhyagami/musix/releases)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 
 > *"Music is the shorthand of emotion."* — Leo Tolstoy
 
 ## Features
 
 - **Adaptive Playlists:** Create dynamic playlists that learn your tempo preferences and adapt to your listening habits.
-- **Low-Latency Audio Engine:** Custom-built audio routing engine ensures glitch-free playback and smooth crossfading.
+- **Low-Latency Audio Engine:** Custom audio routing engine ensures glitch-free playback and smooth crossfading.
 - **Collaborative Editing:** Edit playlists in real-time with other users via WebSockets.
 - **Offline Mode:** Cache your favorite tracks locally to keep the music playing when the connection drops.
 - **Keyboard Shortcuts:** Control playback without leaving your keyboard.
@@ -42,7 +43,7 @@ A Java-based music streaming and playlist manager.
    java -jar target/musix-1.0.0.jar
    ```
 
-4. **Access the UI**  
+4. **Access the UI**
    Open your browser and navigate to `http://localhost:8080` to explore your music library.
 
 ## Architecture
