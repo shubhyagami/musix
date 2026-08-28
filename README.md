@@ -1,6 +1,6 @@
-# 🎵 musix
+# musix
 
-A Java-based music streaming and playlist manager that provides a low-latency custom audio engine.
+A Java‑based music streaming and playlist manager with a low‑latency custom audio engine.
 
 [![Java](https://img.shields.io/badge/Java-17%2B-blue)](https://openjdk.org/)
 [![Build](https://img.shields.io/badge/Build-Maven-brightgreen)](pom.xml)
@@ -8,74 +8,53 @@ A Java-based music streaming and playlist manager that provides a low-latency cu
 [![Release](https://img.shields.io/badge/Release-v1.0.0-blueviolet)](https://github.com/shubhyagami/musix/releases)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 
-Music is the universal language of emotional expression. At musix, we believe in harnessing this power to create a seamless music streaming experience.
+## Overview
+musix provides a lightweight Java audio engine that streams music with minimal latency and supports real‑time collaborative playlists. It is suitable for both standalone use and integration into larger Java applications.
 
 ## Key Features
-
-* **Adaptive Playlists**: Discover new music that resonates with your tempo and preferences
-* **Custom Audio Engine**: Enjoy low-latency playback and smooth crossfading with our proprietary engine
-* **Collaborative Editing**: Edit playlists in real-time with friends and family via WebSockets
-* **Offline Mode**: Cache your favorite tracks locally to keep the music playing when connection drops
-* **Keyboard Shortcuts**: Control playback without leaving your keyboard
+- **Adaptive Playlists** – Discover new tracks that match your listening habits.
+- **Custom Audio Engine** – Low‑latency playback with smooth cross‑fading.
+- **Collaborative Editing** – Edit playlists together over WebSockets.
+- **Offline Mode** – Cache tracks locally for uninterrupted playback.
+- **Keyboard Shortcuts** – Control playback without leaving the keyboard.
 
 ## Getting Started
-
-  To begin, clone the repository using Git:
-
-    ```bash
-    git clone https://github.com/shubhyagami/musix.git
-    cd musix
-    ```
-
-  Then, build and run the project using the following commands:
-
-    ```bash
-    mvn clean package
-    java -jar target/musix-1.0.0.jar
-    ```
-
-    Access the UI by opening your browser at `http://localhost:8080`.
+```bash
+git clone https://github.com/shubhyagami/musix.git
+cd musix
+mvn clean package
+java -jar target/musix-1.0.0.jar
+```
+Open your browser at `http://localhost:8080` to access the UI.
 
 ## Usage
 
 ### Syncing Across Devices
-
-  To enable real-time collaborative playlist editing across multiple clients, use the `--sync` flag.
+Enable real‑time collaborative editing with the `--sync` flag.
 
 ### Keyboard Shortcuts
-
-  * Play/Pause: `Space`
-  * Skip Forward: `j`
-  * Skip Backward: `k`
-  * Toggle Shuffle: `s`
+- Play/Pause: `Space`
+- Skip Forward: `j`
+- Skip Backward: `k`
+- Toggle Shuffle: `s`
 
 ### Offline Mode
-
-  Pre-cache your top 50 tracks using `--cache-limit 50` to ensure uninterrupted playback offline.
+Cache a set number of tracks locally using `--cache-limit <N>` (e.g., `--cache-limit 50`).
 
 ### Exporting Playlists
-
-  Export your playlists as M3U or JSON files using the `--export-playlist` command.
+Export playlists to M3U or JSON format with `--export-playlist <name>`.
 
 ## Architecture
-
-At musix, we employ the **Temporal Audio Routing Engine (TARE)**, a Java 17-based engine that decodes audio streams in isolated memory arenas and routes them via low-latency virtual channels for stable playback.
+The project uses the **Temporal Audio Routing Engine (TARE)**, a Java 17 implementation that decodes audio streams in isolated memory arenas and routes them over low‑latency virtual channels for stable playback.
 
 ## Contributing
-
-Contributions are welcome! If you'd like to contribute, follow these steps:
-
-1. **Open an Issue**: Describe the bug or feature you'd like to propose.
-2. **Create a Branch**: Branch out from `main`.
-    ```bash
-    git checkout -b feature/your-awesome-idea
-    ```
-3. **Make Your Changes**:
-    - Follow the existing code style.
-    - Write tests for your new features or bug fixes.
-    - Keep commits atomic and focused.
-4. **Submit a Pull Request**: Target the `main` branch and provide a clear description of your changes.
+1. Open an issue to discuss bugs or features.  
+2. Fork the repository and create a branch (`git checkout -b feature/your-idea`).  
+3. Implement changes, write tests, and keep commits focused.  
+4. Submit a pull request targeting `main` with a clear description.
 
 ## License
-
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Changelog
+- **v1.0.0** – Initial release with core streaming, collaborative playlists, offline caching, and keyboard controls.
