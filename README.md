@@ -1,89 +1,135 @@
-# musix  
+# musix
 
-A lightweight Java music streaming and playlist manager with a low‑latency custom audio engine.
+musix is a lightweight Java library and command‑line application for streaming audio and managing playlists with low latency. It features a custom audio engine, collaborative playlist editing, offline caching, and keyboard shortcuts.
 
 [![Java](https://img.shields.io/badge/Java-17%2B-blue)](https://openjdk.org/)  
-[![Build](https://img.shields.io/badge/Build-Maven-brightgreen)](https://github.com/shubhyagami/musix/actions)  
+[![Build](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/ci.yml?branch=main&label=build)](https://github.com/shubhyagami/musix/actions)  
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)  
-[![Release](https://img.shields.io/badge/Release-v1.0.0-blueviolet)](https://github.com/shubhyagami/musix/releases)  
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](https://github.com/shubhyagami/musix/pulls)  
-[![Docs](https://img.shields.io/badge/docs-yes-brightgreen)](https://github.com/shubhyagami/musix/blob/main/README.md)  
+[![Release](https://img.shields.io/github/v/release/shubhyagami/musix?label=release)](https://github.com/shubhyagami/musix/releases)  
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](https://github.com/shubhyagami/musix/pulls)
 
----  
+---
 
-## Overview  
+## Table of Contents
 
-`musix` is a compact, fast Java audio engine that streams tracks with minimal latency and supports real‑time collaborative playlists. It can be used as a standalone application or embedded in other Java projects.
+- [Overview](#overview)
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [Command‑Line Usage](#command-line-usage)
+- [Using as a Library](#using-as-a-library)
+- [Architecture](#architecture)
+- [Contributing](#contributing)
+- [Changelog](#changelog)
+- [License](#license)
 
-## Key Features  
+---
 
-- Adaptive playlists that learn your listening habits  
-- Low‑latency custom audio engine with smooth cross‑fading  
-- Collaborative editing via WebSockets for shared playlists  
-- Offline caching for uninterrupted playback  
-- Keyboard shortcuts for hands‑free control  
+## Overview
 
-## Getting Started  
+`musix` combines a fast, low‑latency audio engine with a flexible playlist system. It can be run as a standalone server (`musix-<ver>.jar`) or embedded in other Java projects via Maven. The engine, called **TARE** (Temporal Audio Routing Engine), decodes audio streams in isolated memory arenas and routes them over virtual channels to keep playback smooth.
 
-1. **Clone the repository**  
-   git clone https://github.com/shubhyagami/musix.git  
-   cd musix  
+---
 
-2. **Build**  
-   mvn clean package  
+## Features
 
-3. **Run**  
-   java -jar target/musix-1.0.0.jar [options]  
+| Feature | Description |
+|--------|--------------|
+| **Low‑latency engine** | Cross‑fading audio with minimal delay |
+| **Adaptive playlists** | Playlists learn from your listening habits |
+| **Collaborative editing** | WebSocket server for shared playlists |
+| **Offline caching** | Configurable local cache of tracks |
+| **Keyboard shortcuts** | Play/pause, skip forward/backward, shuffle toggle |
+| **Playlist export** | Export to M3U or JSON |
 
-   By default the application starts a server on http://localhost:8080.  
-   Use --help to see all command‑line options.
+---
 
-### Quick start  
+## Quick Start
 
-mvn clean package && java -jar target/musix-1.0.0.jar  
+```bash
+# Clone, build, and run
+git clone https://github.com/shubhyagami/musix.git
+cd musix
+mvn clean package
+java -jar target/musix-1.0.0.jar
+```
 
-For a minimal launch use the default settings; add --help to explore flags.
+The server starts on `http://localhost:8080`.  
+Use `--help` to see all command‑line options.
 
-## Usage  
+---
 
-### Syncing Across Devices  
+## Command‑Line Usage
 
-Enable collaborative editing with the --sync flag.
+```text
+Usage: musix-<ver>.jar [options]
 
-### Keyboard Shortcuts  
+Options:
+  --help                     Show this help message and exit
+  --port <p>                 Port number (default: 8080)
+  --sync                     Enable collaborative WebSocket server
+  --cache-limit <N>         Max number of tracks cached locally
+  --export-playlist <name>   Export the named playlist (M3U or JSON)
+```
 
-- Space – Play/Pause  
-- j – Skip Forward  
-- k – Skip Backward  
-- s – Toggle Shuffle  
+---
 
-### Offline Mode  
+## Using as a Library
 
-Cache a configurable number of tracks locally using --cache-limit <N> (e.g., --cache-limit 50).
+Add the following dependency to your Maven `pom.xml`:
 
-### Exporting Playlists  
+```xml
+<dependency>
+    <groupId>com.github.shubhyagami</groupId>
+    <artifactId>musix</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
 
-Export playlists to M3U or JSON with --export-playlist <name>.
+Example:
 
-## Architecture  
+```java
+import com.shubhyagami.musix.MusixEngine;
 
-The project uses the **Temporal Audio Routing Engine (TARE)**, a Java 17 implementation that decodes audio streams in isolated memory arenas and routes them over low‑latency virtual channels for stable playback.
+public class Demo {
+    public static void main(String[] args) {
+        MusixEngine engine = new MusixEngine();
+        engine.play("song.mp3");
+        engine.setShuffle(true);
+    }
+}
+```
 
-## Contributing  
+(See the Javadoc for a complete API reference.)
 
-1. Open an issue to discuss bugs or new features.  
-2. Fork the repository and create a branch (git checkout -b feature/your-idea).  
-3. Implement changes, add tests, and keep commits focused.  
-4. Submit a pull request targeting main with a clear description.
+---
 
-## Changelog  
+## Architecture
 
-- **v1.0.0** – Initial release with core streaming, collaborative playlists, offline caching, and keyboard controls.
+musix is built around **TARE** (Temporal Audio Routing Engine). TARE decodes streams in isolated memory arenas and routes them over low‑latency virtual channels, enabling stable playback even under high load.
 
-## License  
+---
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## Contributing
 
----  
+1. Fork the repository and create a feature branch:  
+   `git checkout -b feature/your-idea`
+2. Implement your changes and add tests.
+3. Run the test suite: `mvn test`.
+4. Push and open a pull request against `main`.
+5. Reference any related issue in the PR description.
 
-*Feel free to explore the source, file issues, and contribute!*
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for guidelines and the Code of Conduct.
+
+---
+
+## Changelog
+
+- **v1.0.0** – Initial release: core streaming, collaborative playlists, offline caching, keyboard controls.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+---
