@@ -1,12 +1,12 @@
 # musix
 
-A lightweight Java library and command‑line tool for low‑latency audio playback and collaborative playlist management.
+A lightweight Java library and command‑line server for low‑latency audio playback and collaborative playlist management.
 
-- Fast, low‑latency audio engine (TARE)
-- Collaborative playlist editing via WebSocket
-- Offline caching of tracks
-- Keyboard shortcuts (play / pause / skip / shuffle)
-- CLI and embeddable Maven library
+- **Fast audio engine** (TARE – Temporal Audio Routing Engine)  
+- **Real‑time playlist editing** via WebSocket  
+- **Offline caching** of frequently played tracks  
+- **Keyboard shortcuts**: play, pause, skip, shuffle  
+- **CLI** and a Maven‑ready library
 
 ![Java](https://img.shields.io/badge/Java-17%2B-blue)  
 ![Build](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/ci.yml?branch=main&label=build)  
@@ -15,23 +15,23 @@ A lightweight Java library and command‑line tool for low‑latency audio playb
 ![Release](https://img.shields.io/github/v/release/shubhyagami/musix?label=release)  
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
----
+---  
 
-## Getting Started
+## Quick start
 
 ```bash
-# Clone the repository
+# Clone the repo
 git clone https://github.com/shubhyagami/musix.git
 cd musix
 
-# Build the project
+# Build
 mvn clean package
 
-# Run the server (defaults to http://localhost:8080)
+# Run the server (default: http://localhost:8080)
 java -jar target/musix-1.0.0.jar
 ```
 
-Display all command‑line options:
+Show all options:
 
 ```bash
 java -jar target/musix-1.0.0.jar --help
@@ -41,28 +41,26 @@ java -jar target/musix-1.0.0.jar --help
 
 ## Features
 
-| Feature | Description |
-|---------|-------------|
-| **Low‑latency engine** | Cross‑fades between tracks with minimal delay using TARE (Temporal Audio Routing Engine). |
-| **Adaptive playlist** | Learns from listening patterns to suggest tracks. |
-| **Collaborative editing** | Real‑time sharing of playlists over WebSocket. |
-| **Offline caching** | Configurable local cache for frequent tracks. |
-| **Keyboard shortcuts** | Play, pause, skip forward/backward, toggle shuffle. |
-| **Export** | Export playlists to M3U or JSON. |
+* **Low‑latency engine** – Cross‑fades with sub‑second delay.  
+* **Adaptive suggestions** – Builds a model of your listening habits.  
+* **Collaborative playlists** – WebSocket sync for multi‑user editing.  
+* **Local cache** – Configurable cache size for hot tracks.  
+* **Keyboard bindings** – play, pause, skip, shuffle.  
+* **Export** – M3U and JSON playlist export.  
 
 ---
 
-## Command‑Line Usage
+## Command‑Line options
 
-```text
-Usage: musix-<ver>.jar [options]
+```
+Usage: musix‑<version>.jar [options]
 
 Options:
   --help                     Show this help message and exit
   --port <p>                 Port number (default: 8080)
   --sync                     Enable WebSocket collaboration
   --cache-limit <N>          Max number of tracks cached locally
-  --export-playlist <name>   Export the named playlist (M3U or JSON)
+  --export-playlist <name>    Export the named playlist (M3U or JSON)
 ```
 
 ---
@@ -93,34 +91,35 @@ public class Demo {
 }
 ```
 
-See the [Javadoc](https://github.com/shubhyagami/musix/tree/main/docs) for complete API details.
+Full API details are in the [Javadoc](https://github.com/shubhyagami/musix/tree/main/docs).
 
 ---
 
 ## Architecture
 
-`musix` revolves around TARE, which decodes audio in isolated memory arenas and routes them through low‑latency virtual channels. This design keeps playback smooth even under heavy load and enables rapid playlist transitions.
+`musix` is built around the Temporal Audio Routing Engine (TARE).  
+Audio data is decoded into isolated memory arenas and routed through virtual channels, giving the engine very low latency and predictable CPU usage even under heavy load. The WebSocket layer uses a lightweight protocol that pushes minimal state to collaborators, keeping bandwidth usage small.
 
 ---
 
 ## Contributing
 
-1. Fork the repo and create a feature branch:  
-   `git checkout -b feature/your‑feature`
-2. Add unit tests for any new or modified code.
-3. Run the test suite: `mvn test`.
-4. Open a pull request against `main` and reference any related issue.
+1. Fork the repository and create a feature branch:  
+   `git checkout -b feature/your‑feature`  
+2. Write unit tests.  
+3. Run the test suite: `mvn test`.  
+4. Open a pull request against `main`.  
 
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for detailed guidelines and the Code of Conduct.
+See the [CONTRIBUTING](CONTRIBUTING.md) file for detailed guidelines and the Code of Conduct.
 
 ---
 
 ## Changelog
 
-- **v1.0.0** – Initial release: engine, collaborative playlists, offline caching, keyboard controls.
+* **v1.0.0** – Initial release: engine, collaborative playlists, offline caching, keyboard controls.
 
 ---
 
 ## License
 
-MIT © 2026 Shubhyagami. See the [LICENSE](LICENSE) file.
+MIT © 2026 Shubhyagami – see the [LICENSE](LICENSE) file.
