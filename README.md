@@ -1,5 +1,10 @@
-# musix
-A lightweight Java library and command‑line server that delivers low‑latency audio playback and real‑time collaborative playlist management.
+# Musix
+
+Musix is a lightweight Java library and a short‑running command‑line server that delivers low‑latency audio playback and real‑time, collaborative playlist management.
+
+---
+
+## 📦 Build & CI
 
 ![Java](https://img.shields.io/badge/Java-17%2B-blue)  
 ![Build](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/ci.yml?branch=main&label=build)  
@@ -11,11 +16,15 @@ A lightweight Java library and command‑line server that delivers low‑latency
 
 ---
 
-## Table of Contents
-- [Getting Started](#getting-started)
+## 📚 Table of Contents
+
+- [Overview](#overview)
 - [Features](#features)
-- [Command‑Line Usage](#command-line-usage)
-- [Library API](#library-api)
+- [Getting Started](#getting-started)
+  - [Server](#server)
+  - [Library](#library)
+- [Command‑Line Options](#command-line-options)
+- [API Reference](#api-reference)
 - [Architecture](#architecture)
 - [Contributing](#contributing)
 - [Changelog](#changelog)
@@ -23,7 +32,26 @@ A lightweight Java library and command‑line server that delivers low‑latency
 
 ---
 
+## Overview
+
+Musix combines a deterministic audio engine with a lightweight WebSocket layer for collaborative playlist editing. It is built to run on Java 17+ and is packaged as a single executable JAR or a Maven dependency. The server serves a minimal HTTP+WebSocket API, while the library offers a programmatic interface for embedded usage.
+
+---
+
+## Features
+
+- **Deterministic low‑latency engine** – sub‑second cross‑fade and predictable CPU usage.
+- **Real‑time collaboration** – WebSocket protocol syncs playlist changes across clients.
+- **Adaptive recommendations** – tracks are suggested based on listening history.
+- **Configurable local cache** – keep hot tracks in memory up to a configurable limit.
+- **Keyboard shortcuts** – play, pause, skip, shuffle, and more.
+- **Export support** – M3U and JSON playlist export.
+
+---
+
 ## Getting Started
+
+### Server
 
 ```bash
 # Clone the repository
@@ -33,45 +61,17 @@ cd musix
 # Build with Maven
 mvn clean package
 
-# Run the server (defaults to http://localhost:8080)
+# Run the server (default: http://localhost:8080)
 java -jar target/musix-1.0.0.jar
 ```
 
-See all available options:
+View available command‑line flags:
 
 ```bash
 java -jar target/musix-1.0.0.jar --help
 ```
 
----
-
-## Features
-
-- **Low‑latency engine** – sub‑second cross‑fade and deterministic CPU usage.
-- **WebSocket collaboration** – real‑time playlist editing for multiple users.
-- **Adaptive suggestions** – learning from listening habits.
-- **Local cache** – config‑driven size limit for hot tracks.
-- **Keyboard shortcuts** – play, pause, skip, shuffle.
-- **Export** – M3U and JSON playlist export.
-
----
-
-## Command‑Line Usage
-
-```text
-Usage: musix-<version>.jar [options]
-
-Options:
-  --help                      Show help and exit
-  --port <p>                  Port number (default: 8080)
-  --sync                      Enable WebSocket collaboration
-  --cache-limit <N>           Max number of tracks cached locally
-  --export-playlist <name>    Export the named playlist (M3U or JSON)
-```
-
----
-
-## Library API
+### Library
 
 Add the dependency to your `pom.xml`:
 
@@ -83,7 +83,7 @@ Add the dependency to your `pom.xml`:
 </dependency>
 ```
 
-Typical usage:
+Sample usage:
 
 ```java
 import com.shubhyagami.musix.MusixEngine;
@@ -106,29 +106,70 @@ Full API documentation is available in the generated [Javadoc](https://github.co
 
 ---
 
+## Command‑Line Options
+
+```
+Usage: musix-<version>.jar [options]
+
+Options:
+  --help                      Show help and exit
+  --port <p>                  Port number (default: 8080)
+  --sync                      Enable WebSocket collaboration
+  --cache-limit <N>           Max number of tracks cached locally
+  --export-playlist <name>    Export the named playlist (M3U or JSON)
+```
+
+---
+
+## API Reference
+
+The public API is dominated by the `MusixEngine` class:
+
+| Method | Description |
+|--------|-------------|
+| `loadPlaylist(String path)` | Load an M3U or JSON playlist. |
+| `play()` | Start playback. |
+| `pause()` | Pause playback. |
+| `stop()` | Stop playback. |
+| `setShuffle(boolean)` | Toggle shuffle mode. |
+| `addListener(Consumer<Event>)` | Register a callback for playback events. |
+
+See the [Javadoc](https://github.com/shubhyagami/musix/tree/main/docs) for the full set of methods and event types.
+
+---
+
 ## Architecture
 
-`musix` is built around the Temporal Audio Routing Engine (TARE). Audio frames are decoded into isolated memory arenas and routed through virtual channels, providing very low latency and predictable CPU usage even under heavy load. The WebSocket layer uses a lightweight protocol that pushes only minimal state to collaborators, keeping bandwidth consumption low. The server side is a minimal, self‑contained HTTP + WebSocket listener implemented with Jetty.
+Musix is centered around the *Temporal Audio Routing Engine* (TARE). Audio data is decoded into isolated memory arenas that are routed through virtual channels, ensuring deterministic latency and predictable CPU usage even under heavy load.  
+
+The WebSocket layer uses a lightweight protocol that pushes only the minimal state required for collaboration, keeping bandwidth consumption low. The server is a self‑contained HTTP + WebSocket listener implemented with Jetty.
 
 ---
 
 ## Contributing
 
-1. Fork the repository and create a feature branch  
+We welcome contributions! Please:
+
+1. Fork the repository and create a feature branch:
    ```bash
    git checkout -b feature/your-feature
    ```
-2. Write unit tests for your changes.  
-3. Run the test suite: `mvn test`.  
-4. Open a pull request against `main`.  
-5. Follow the guidelines in the [CONTRIBUTING](CONTRIBUTING.md) and the Code of Conduct.
+2. Write unit tests for your changes.
+3. Run the test suite with `mvn test`.
+4. Submit a pull request against the `main` branch.
+
+Follow the guidelines in the [CONTRIBUTING](CONTRIBUTING.md) file and the Code of Conduct.
 
 ---
 
 ## Changelog
 
 ### v1.0.0
-- Initial release: low‑latency engine, collaborative playlists, offline caching, keyboard shortcuts, export support.
+- Initial release
+- Low‑latency audio engine
+- WebSocket‑based playlist collaboration
+- Local caching and adaptive recommendations
+- Keyboard shortcuts and export support
 
 ---
 
