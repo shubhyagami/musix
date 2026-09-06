@@ -1,6 +1,22 @@
 # Musix
 
-Musix is a lightweight Java library and a short‑running command‑line server that delivers low‑latency audio playback and real‑time, collaborative playlist management.
+> A lightweight Java library and command‑line server for low‑latency audio playback with real‑time playlist collaboration.
+
+---
+
+## Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/shubhyagami/musix.git
+cd musix
+
+# Build & run the demo server (default: http://localhost:8080)
+mvn clean package
+java -jar target/musix-1.0.0.jar
+```
+
+Run `java -jar target/musix-1.0.0.jar --help` to see all command‑line options.
 
 ---
 
@@ -11,18 +27,18 @@ Musix is a lightweight Java library and a short‑running command‑line server 
 ![Tests](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/tests.yml?branch=main&label=tests)
 ![Coverage](https://img.shields.io/codecov/c/github/shubhyagami/musix)
 ![Release](https://img.shields.io/github/v/release/shubhyagami/musix?label=release)
-![License: MIT](https://img.shields.io/badge/License-MIT-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-brightgreen)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
 ---
 
-## 📚 Table of Contents
+## Table of Contents
 
 - [Overview](#overview)
 - [Features](#features)
 - [Getting Started](#getting-started)
-  - [Server](#server)
-  - [Library](#library)
+  - [Run the Server](#run-the-server)
+  - [Use the Library](#use-the-library)
 - [Command‑Line Options](#command-line-options)
 - [API Reference](#api-reference)
 - [Architecture](#architecture)
@@ -34,44 +50,34 @@ Musix is a lightweight Java library and a short‑running command‑line server 
 
 ## Overview
 
-Musix combines a deterministic audio engine with a lightweight WebSocket layer that enables real‑time playlist editing across multiple clients. It is built for Java 17+ and can be used as either a standalone server (executable JAR) or a Maven dependency in your own projects.
+Musix delivers deterministic, low‑latency audio playback on Java 17+. It combines a high‑performance audio engine with a lightweight Jetty‑based HTTP and WebSocket server. Clients can connect to the server or use the standalone library to manage playlists, synchronize changes in real time, and play music directly from Java code.
 
 ---
 
 ## Features
 
-- **Deterministic, low‑latency audio** – sub‑second cross‑fade, predictable CPU usage.
-- **Real‑time collaboration** – WebSocket protocol syncs playlist changes instantly.
-- **Adaptive recommendations** – tracks are suggested based on listening history.
+- **Deterministic audio** – sub‑second cross‑fade, predictable CPU usage.
+- **Real‑time collaboration** – WebSocket protocol synchronizes playlist changes instantly.
+- **Adaptive recommendations** – tracks suggested from listening history.
 - **Configurable local cache** – keep hot tracks in memory up to a user‑defined limit.
 - **Keyboard shortcuts** – play, pause, skip, shuffle, and more.
-- **Export support** – M3U and JSON playlist export.
+- **Export support** – M3U & JSON playlist export.
 
 ---
 
 ## Getting Started
 
-### Server
+### Run the Server
 
 ```bash
-# Clone the repository
-git clone https://github.com/shubhyagami/musix.git
-cd musix
-
-# Build with Maven
+# Build the JAR
 mvn clean package
 
-# Run the server (default: http://localhost:8080)
+# Run (default: http://localhost:8080)
 java -jar target/musix-1.0.0.jar
 ```
 
-View available command‑line flags:
-
-```bash
-java -jar target/musix-1.0.0.jar --help
-```
-
-### Library
+### Use the Library
 
 Add the dependency to your `pom.xml`:
 
@@ -91,12 +97,9 @@ import com.shubhyagami.musix.MusixEngine;
 public class Demo {
     public static void main(String[] args) {
         MusixEngine engine = new MusixEngine();
-
         engine.loadPlaylist("my_playlist.m3u");
         engine.play();
         engine.setShuffle(true);
-
-        // Listen to events
         engine.addListener(event -> System.out.println(event));
     }
 }
@@ -108,31 +111,31 @@ Full API documentation is available in the generated [Javadoc](https://github.co
 
 ## Command‑Line Options
 
-```
+```text
 Usage: musix-<version>.jar [options]
 
 Options:
   --help                      Show help and exit
   --port <p>                  Port number (default: 8080)
-  --sync                       Enable WebSocket collaboration
+  --sync                      Enable WebSocket collaboration
   --cache-limit <N>           Max number of tracks cached locally
-  --export-playlist <name>    Export the named playlist (M3U or JSON)
+  --export-playlist <name>    Export named playlist (M3U or JSON)
 ```
 
 ---
 
 ## API Reference
 
-The public API is centered around the `MusixEngine` class:
+The core of the library is the `MusixEngine` class.
 
-| Method                     | Description                                           |
-|----------------------------|-------------------------------------------------------|
-| `loadPlaylist(String path)`| Load an M3U or JSON playlist.                       |
-| `play()`                   | Start playback.                                        |
-| `pause()`                  | Pause playback.                                       |
-| `stop()`                   | Stop playback.                                        |
-| `setShuffle(boolean)`      | Toggle shuffle mode.                                 |
-| `addListener(Consumer<Event>)` | Register a callback for playback events.     |
+| Method                                 | Description                                    |
+|----------------------------------------|------------------------------------------------|
+| `loadPlaylist(String path)`            | Load an M3U or JSON playlist.                |
+| `play()`                               | Start playback.                                |
+| `pause()`                               | Pause playback.                               |
+| `stop()`                                | Stop playback.                                |
+| `setShuffle(boolean)`                   | Toggle shuffle mode.                          |
+| `addListener(Consumer<Event>)`          | Register a callback for playback events.      |
 
 See the full Javadoc for additional methods and event types.
 
@@ -140,13 +143,13 @@ See the full Javadoc for additional methods and event types.
 
 ## Architecture
 
-Musix revolves around the *Temporal Audio Routing Engine* (TARE). Audio data is decoded into isolated memory arenas that are routed through virtual channels, guaranteeing deterministic latency and predictable CPU usage. The WebSocket layer pushes only the minimal state required for collaboration, keeping bandwidth consumption low. The server is a self‑contained HTTP + WebSocket listener built with Jetty.
+Musix is built around the *Temporal Audio Routing Engine* (TARE). Audio data is decoded into isolated memory arenas that flow through virtual channels, guaranteeing deterministic latency and predictable CPU usage. The WebSocket layer transmits only the minimal state needed for collaboration, keeping bandwidth low. The server is a self‑contained HTTP + WebSocket listener built with Jetty.
 
 ---
 
 ## Contributing
 
-We welcome contributions! Please:
+We welcome contributions! Please follow these steps:
 
 1. Fork the repository and create a feature branch:
    ```bash
@@ -156,7 +159,7 @@ We welcome contributions! Please:
 3. Run the test suite with `mvn test`.
 4. Submit a pull request against the `main` branch.
 
-Follow the guidelines in the [CONTRIBUTING](CONTRIBUTING.md) file and the Code of Conduct.
+Refer to the [CONTRIBUTING](CONTRIBUTING.md) file and the Code of Conduct for more details.
 
 ---
 
