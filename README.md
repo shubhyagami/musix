@@ -1,60 +1,76 @@
 # Musix
 
-Musix is a lightweight Java library and embedded Jetty server that delivers deterministic, low‑latency audio playback and real‑time playlist collaboration over WebSocket.
+A lightweight Java library and embedded Jetty server that delivers deterministic, low‑latency audio playback and real‑time playlist collaboration over WebSocket.
+
+> **Getting started** – see the section below for a quick guide.
+
+---
+
+## Features
+
+- Deterministic audio engine with sub‑second cross‑fade and minimal CPU usage  
+- WebSocket‑based playlist collaboration; only the necessary state is transmitted  
+- Playlist export in M3U or JSON format  
+- Configurable local cache size for fast repeat playback  
+- Adaptive recommendations (optional)  
+- Keyboard shortcuts for common actions  
 
 ---
 
 ## Badges
 
-![Java](https://img.shields.io/badge/Java-17%2B-blue)
-![Build](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/ci.yml?branch=main&label=build)
-![Tests](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/tests.yml?branch=main&label=tests)
-![Coverage](https://img.shields.io/codecov/c/github/shubhyagami/musix)
-![Release](https://img.shields.io/github/v/release/shubhyagami/musix?label=release)
-![License](https://img.shields.io/badge/License-MIT-brightgreen)
+![Java](https://img.shields.io/badge/Java-17%2B-blue)  
+![Build](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/ci.yml?branch=main&label=build)  
+![Tests](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/tests.yml?branch=main&label=tests)  
+![Coverage](https://img.shields.io/codecov/c/github/shubhyagami/musix)  
+![Release](https://img.shields.io/github/v/release/shubhyagami/musix?label=release)  
+![License](https://img.shields.io/badge/License-MIT-brightgreen)  
+![Maven Central](https://img.shields.io/maven-central/v/com.github.shubhyagami/musix?style=flat&label=Maven%20Central)
 
 ---
 
 ## Quick start
 
 ```bash
-# Clone the repo
+# 1. Clone the repository
 git clone https://github.com/shubhyagami/musix.git
 cd musix
 
-# Build the JAR
+# 2. Build the executable jar
 mvn clean package
 
-# Run the demo server (default: http://localhost:8080)
+# 3. Run the demo server (default: http://localhost:8080)
 java -jar target/musix-1.0.0.jar
 ```
 
-Run `java -jar target/musix-1.0.0.jar --help` to view all command‑line options.
+Run `java -jar target/musix-1.0.0.jar --help` to see all command‑line options.
 
 ---
 
-## Getting started
-
-### 1️⃣ Run the server locally
+## Using the server locally
 
 ```bash
-# Build first
+# Build the jar
 mvn clean package
 
-# Start
+# Start the server on port 8080, with WebSocket collaboration enabled
 java -jar target/musix-1.0.0.jar --port 8080 --sync
 ```
 
-The server exposes:
+The following endpoints are available:
 
-- `http://<host>:<port>/` – a simple health‑check page.
-- `ws://<host>:<port>/ws` – WebSocket endpoint for playlist collaboration.
+| Endpoint | Purpose |
+| -------- | ------- |
+| `http://<host>:<port>/`  | Simple health‑check page |
+| `ws://<host>:<port>/ws`  | WebSocket for playlist collaboration |
 
-### 2️⃣ Use Musix as a library
+---
 
-Add one of the following snippets to your project:
+## Using Musix as a library
 
-> **Maven**
+Add the dependency to your project.
+
+**Maven**
 
 ```xml
 <dependency>
@@ -64,19 +80,19 @@ Add one of the following snippets to your project:
 </dependency>
 ```
 
-> **Gradle (Kotlin DSL)**
+**Gradle (Kotlin DSL)**
 
 ```kotlin
 implementation("com.github.shubhyagami:musix:1.0.0")
 ```
 
-> **Gradle (Groovy DSL)**
+**Gradle (Groovy DSL)**
 
 ```groovy
 implementation 'com.github.shubhyagami:musix:1.0.0'
 ```
 
-**Example usage**
+### Example usage
 
 ```java
 import com.shubhyagami.musix.MusixEngine;
@@ -93,13 +109,16 @@ public class Demo {
 }
 ```
 
-Full API documentation is available in the generated [Javadoc](https://github.com/shubhyagami/musix/tree/main/docs).
+### API Documentation
+
+Full Javadoc is available in the `docs` directory of the repository:  
+https://github.com/shubhyagami/musix/tree/main/docs
 
 ---
 
 ## Command‑line options
 
-```text
+```
 Usage: musix-<version>.jar [options]
 
 Options:
@@ -107,32 +126,32 @@ Options:
   --port <p>                 Port number (default: 8080)
   --sync                     Enable WebSocket collaboration
   --cache-limit <N>          Max number of tracks to keep in local memory
-  --export-playlist <name>   Export named playlist (M3U or JSON)
+  --export-playlist <name>   Export the named playlist (M3U or JSON)
 ```
 
 ---
 
-## Core API
+## Core API (selected methods)
 
-| Method                           | Description                                          |
-|----------------------------------|------------------------------------------------------|
-| `loadPlaylist(String path)`      | Load an M3U or JSON playlist                         |
-| `play()`                         | Start playback                                        |
-| `pause()`                        | Pause playback                                       |
-| `stop()`                         | Stop playback                                        |
-| `setShuffle(boolean)`             | Toggle shuffle mode                                  |
-| `addListener(Consumer<Event>)`    | Register a callback for playback events              |
-| `exportPlaylist(String name)`    | Export the current playlist as M3U or JSON           |
+| Method                           | Description                                 |
+|----------------------------------|---------------------------------------------|
+| `loadPlaylist(String path)`      | Load an M3U or JSON playlist                |
+| `play()`                         | Start playback                              |
+| `pause()`                        | Pause playback                              |
+| `stop()`                         | Stop playback                               |
+| `setShuffle(boolean)`            | Toggle shuffle mode                          |
+| `addListener(Consumer<Event>)`   | Register a callback for playback events     |
+| `exportPlaylist(String name)`    | Export the current playlist as M3U or JSON   |
 
-For additional methods and event types, refer to the Javadoc.
+For the complete API, refer to the Javadoc.
 
 ---
 
-## Architecture
+## Architecture Overview
 
-- **Audio engine** – deterministic, sub‑second cross‑fade and low CPU usage; tracks are decoded into isolated memory arenas.
-- **WebSocket layer** – transmits only the state needed for collaboration, keeping traffic minimal.
-- **Server** – a self‑contained Jetty HTTP + WebSocket listener that serves the client API.
+- **Audio engine** – deterministic, sub‑second cross‑fade, low CPU usage; tracks are decoded into isolated memory arenas.  
+- **WebSocket layer** – sends only the minimal state required for collaboration, keeping traffic light.  
+- **Server** – a self‑contained Jetty HTTP + WebSocket listener that exposes the API.
 
 ---
 
@@ -140,23 +159,23 @@ For additional methods and event types, refer to the Javadoc.
 
 Pull requests are welcome. Please follow these steps:
 
-1. Fork the repository and create a feature branch (`git checkout -b feature/your-feature`).
-2. Write unit tests for your changes.
-3. Run the test suite (`mvn test`).
-4. Push your branch and create a pull request to `main`.
+1. Fork the repository and create a new feature branch (`git checkout -b feature/your-feature`).  
+2. Write unit tests for the changes you make.  
+3. Run the test suite (`mvn test`) and ensure all tests pass.  
+4. Push your branch and create a pull request targeting `main`.
 
-See the full guidelines in [CONTRIBUTING.md](CONTRIBUTING.md) and the Code of Conduct.
+Additional guidelines are in [CONTRIBUTING.md](CONTRIBUTING.md) and the Code of Conduct.
 
 ---
 
 ## Changelog
 
-### v1.0.0 – 2026-09-07
+## v1.0.0 – 2026‑09‑07
 
 - Initial release
 - Deterministic low‑latency engine
 - WebSocket‑based playlist collaboration
-- Local cache with configurable size
+- Configurable local cache
 - Adaptive recommendations
 - Keyboard shortcuts and export support
 
