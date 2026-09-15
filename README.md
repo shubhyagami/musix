@@ -1,23 +1,6 @@
 # Musix
 
-A lightweight Java library and embedded Jetty server designed for deterministic, low‑latency audio playback and real‑time playlist collaboration over WebSocket.
-
-> **Getting started** – see the sections below for a quick guide.
-
----
-
-## Features
-
-- Deterministic audio engine with sub‑second cross‑fades and minimal CPU usage  
-- WebSocket‑based playlist collaboration – only the minimal state is transmitted  
-- Export playlists as M3U or JSON  
-- Local cache of decoded tracks with configurable size  
-- Optional adaptive recommendations  
-- Keyboard shortcuts for common actions  
-
----
-
-## Badges
+A compact Java library and Jetty‑based server that delivers deterministic, low‑latency audio playback with real‑time playlist collaboration over WebSocket.
 
 ![Java](https://img.shields.io/badge/Java-17%2B-blue)  
 ![Build](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/ci.yml?branch=main&label=build)  
@@ -25,106 +8,48 @@ A lightweight Java library and embedded Jetty server designed for deterministic,
 ![Coverage](https://img.shields.io/codecov/c/github/shubhyagami/musix)  
 ![Release](https://img.shields.io/github/v/release/shubhyagami/musix?label=release)  
 ![License](https://img.shields.io/badge/License-MIT-brightgreen)  
-![Maven Central](https://img.shields.io/maven-central/v/com.github.shubhyagami/musix?style=flat&label=Maven%20Central)  
+![Maven Central](https://img.shields.io/maven-central/v/com.github.shubhyagami/musix?style=flat&label=Maven%20Central)
 
 ---
 
-## Table of contents
+## Features
 
-- [Installation](#installation)
-  - [As a standalone server](#standalone-server)
-  - [As a dependency](#dependency)
-- [Quick start](#quick-start)
-- [Server usage](#using-the-server)
-  - [Endpoints](#endpoints)
-- [Library usage](#using-musix-as-a-library)
-  - [Example](#example-usage)
-- [Command‑line options](#command-line-options)
-- [API overview](#api-overview)
-- [Architecture](#architecture)
-- [Contributing](#contributing)
-- [Changelog](#changelog)
-- [License](#license)
+- Deterministic audio engine with sub‑second cross‑fades and low CPU usage  
+- WebSocket‑based playlist collaboration, transmitting only minimal state  
+- Export playlists as M3U or JSON  
+- Configurable in‑memory cache of decoded tracks  
+- Optional adaptive recommendations  
+- Keyboard shortcuts for common actions  
 
 ---
 
-## Installation
-
-### As a standalone server
+## Getting Started
 
 ```bash
-# 1. Clone the repo
 git clone https://github.com/shubhyagami/musix.git
 cd musix
-
-# 2. Build the JAR
 mvn clean package
-
-# 3. Run the demo server
 java -jar target/musix-1.0.0.jar
 ```
 
-The server is bundled with a simple health‑check page and a WebSocket endpoint.  
-Run `java -jar target/musix-1.0.0.jar --help` to list all available command‑line options.
+The demo server starts on `http://localhost:8080/` with a health‑check page.  
+The WebSocket endpoint is `ws://localhost:8080/ws`.  
+Run `java -jar target/musix-1.0.0.jar --help` for a full list of command‑line options.
 
-### As a dependency
-
-**Maven**
-
-```xml
-<dependency>
-  <groupId>com.github.shubhyagami</groupId>
-  <artifactId>musix</artifactId>
-  <version>1.0.0</version>
-</dependency>
-```
-
-**Gradle (Kotlin DSL)**
-
-```kotlin
-implementation("com.github.shubhyagami:musix:1.0.0")
-```
-
-**Gradle (Groovy DSL)**
-
-```groovy
-implementation 'com.github.shubhyagami:musix:1.0.0'
-```
-
----
-
-## Quick start
+### Server Configuration
 
 ```bash
-# Build the executable JAR
-mvn clean package
-
-# Run the demo server (defaults to http://localhost:8080)
-java -jar target/musix-1.0.0.jar
-```
-
----
-
-## Using the server
-
-```bash
-# Build the JAR
-mvn clean package
-
-# Start the server on port 8080 with collaboration enabled
 java -jar target/musix-1.0.0.jar --port 8080 --sync
 ```
 
-### Endpoints
-
-| URL | Purpose |
-|-----|---------|
-| `http://<host>:<port>/` | Simple health‑check page |
-| `ws://<host>:<port>/ws` | WebSocket for playlist collaboration |
+- `--port <p>` – set the HTTP/WebSocket port (default 8080)  
+- `--sync` – enable real‑time playlist collaboration  
+- `--cache-limit <N>` – maximum number of tracks kept in memory  
+- `--export-playlist <name>` – export the named playlist as M3U or JSON  
 
 ---
 
-## Using Musix as a library
+## Using Musix as a Library
 
 ```java
 import com.shubhyagami.musix.MusixEngine;
@@ -141,30 +66,36 @@ public class Demo {
 }
 ```
 
-Full Javadoc is available in the `docs` directory of the repository:  
-https://github.com/shubhyagami/musix/tree/main/docs
+Add it as a dependency:
+
+```xml
+<!-- Maven -->
+<dependency>
+  <groupId>com.github.shubhyagami</groupId>
+  <artifactId>musix</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
+```kotlin
+// Gradle Kotlin DSL
+implementation("com.github.shubhyagami:musix:1.0.0")
+```
+
+```groovy
+// Gradle Groovy DSL
+implementation 'com.github.shubhyagami:musix:1.0.0'
+```
+
+Full Javadoc is available in the `docs` directory:  
+[docs](https://github.com/shubhyagami/musix/tree/main/docs)
 
 ---
 
-## Command‑line options
+## API Overview (selected)
 
-```
-Usage: musix-<version>.jar [options]
-
-Options:
-  --help                     Show help and exit
-  --port <p>                 Port number (default: 8080)
-  --sync                     Enable WebSocket collaboration
-  --cache-limit <N>          Max number of tracks to keep in local memory
-  --export-playlist <name>   Export the named playlist (M3U or JSON)
-```
-
----
-
-## API overview (selected members)
-
-| Method | Description |
-|--------|-------------|
+| Method | Purpose |
+|--------|---------|
 | `loadPlaylist(String path)` | Load an M3U or JSON playlist |
 | `play()` | Start playback |
 | `pause()` | Pause playback |
@@ -173,26 +104,28 @@ Options:
 | `addListener(Consumer<Event>)` | Register a callback for playback events |
 | `exportPlaylist(String name)` | Export the current playlist as M3U or JSON |
 
-See the Javadoc for the complete API.
+See the Javadoc for the full API.
 
 ---
 
 ## Architecture
 
-- **Audio engine** – deterministic, sub‑second cross‑fade, low CPU usage; tracks are decoded into isolated memory arenas.  
-- **WebSocket layer** – sends only the minimal state required for collaboration, keeping traffic light.  
-- **Server** – a self‑contained Jetty HTTP + WebSocket listener that exposes the API.
+| Layer | Responsibility |
+|-------|-----------------|
+| Audio Engine | Deterministic playback, sub‑second cross‑fades, isolated memory arenas |
+| WebSocket Layer | Minimal‑state transmission for real‑time collaboration |
+| Server | Self‑contained Jetty HTTP + WebSocket listener exposing the API |
 
 ---
 
 ## Contributing
 
-Pull requests are welcome. Please follow these steps:
+Pull requests are welcome. Please:
 
-1. Fork the repository and create a new feature branch (`git checkout -b feature/your-feature`).  
+1. Fork the repository and create a feature branch (`git checkout -b feature/your-feature`).  
 2. Write unit tests for the changes.  
-3. Run the test suite (`mvn test`) and ensure all tests pass.  
-4. Push your branch and create a pull request targeting `main`.
+3. Run `mvn test` and verify all tests pass.  
+4. Submit a pull request against the `main` branch.
 
 Additional guidelines are in [`CONTRIBUTING.md`](CONTRIBUTING.md) and the Code of Conduct.
 
