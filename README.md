@@ -1,34 +1,19 @@
 # Musix
 
 Deterministic, low‑latency audio playback with real‑time playlist collaboration.  
-A lightweight Java library plus an embedded Jetty server that exposes a simple HTTP/​WebSocket API.
+A lightweight Java 17+ library that comes bundled with an embedded Jetty server exposing a simple HTTP/​WebSocket API.
 
-![Java](https://img.shields.io/badge/Java-17%2B-blue)  
-![Build](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/ci.yml?branch=main&label=build)  
-![Tests](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/tests.yml?branch=main&label=tests)  
-![Coverage](https://img.shields.io/codecov/c/github/shubhyagami/musix)  
-![Release](https://img.shields.io/github/v/release/shubhyagami/musix?label=release)  
-![License](https://img.shields.io/badge/License-MIT-brightgreen)  
-![Maven Central](https://img.shields.io/maven-central/v/com.github.shubhyagami/musix?style=flat&label=Maven%20Central)
+[![Java](https://img.shields.io/badge/Java-17%2B-blue)](https://www.oracle.com/java/)
+[![Build](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/ci.yml?branch=main&label=build)](https://github.com/shubhyagami/musix/actions/workflows/ci.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/tests.yml?branch=main&label=tests)](https://github.com/shubhyagami/musix/actions/workflows/tests.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/shubhyagami/musix)](https://app.codecov.io/gh/shubhyagami/musix)
+[![Release](https://img.shields.io/github/v/release/shubhyagami/musix?label=release)](https://github.com/shubhyagami/musix/releases)
+[![License](https://img.shields.io/badge/License-MIT-brightgreen)](LICENSE)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.shubhyagami/musix?style=flat&label=Maven%20Central)](https://repo1.maven.org/maven2/com/github/shubhyagami/musix/)
 
-## Features
+---
 
-- Deterministic playback with sub‑second cross‑fades  
-- Very low CPU usage – suitable for embedded systems  
-- WebSocket‑based playlist collaboration with minimal state transfer  
-- Export playlists as M3U or JSON  
-- Configurable in‑memory cache for decoded tracks  
-- Optional adaptive recommendation hook  
-- Keyboard shortcuts for common actions in the demo server
-
-## Getting Started
-
-### Prerequisites
-
-* Java 17 or newer  
-* Maven 3.8+ (only if you build from source)
-
-### Run the bundled demo server
+## Quick start
 
 ```bash
 git clone https://github.com/shubhyagami/musix.git
@@ -37,11 +22,11 @@ mvn clean package
 java -jar target/musix-1.0.0.jar
 ```
 
-The server listens on `http://localhost:8080/` and exposes a health‑check page.  
-WebSocket endpoint: `ws://localhost:8080/ws`.  
-Use `java -jar target/musix-1.0.0.jar --help` to see all command‑line options.
+The demo server listens on **`http://localhost:8080/`** and exposes a health‑check page.  
+WebSocket endpoint: **`ws://localhost:8080/ws`**.  
+Run `java -jar target/musix-1.0.0.jar --help` for a list of options.
 
-#### Server options
+### Server options
 
 | Flag | Description |
 |------|-------------|
@@ -51,9 +36,23 @@ Use `java -jar target/musix-1.0.0.jar --help` to see all command‑line options.
 | `--export-playlist <name>` | Export the named playlist as M3U or JSON |
 | `--help` | Show help message |
 
-## Using Musix as a Library
+---
 
-Add the library to your project.
+## Features
+
+- Deterministic playback with sub‑second cross‑fades  
+- Extremely low CPU usage (ideal for embedded devices)  
+- WebSocket‑based real‑time playlist collaboration with minimal state transfer  
+- Export playlists to M3U or JSON  
+- Configurable in‑memory cache for decoded tracks  
+- Optional adaptive recommendation hook  
+- Demo server includes keyboard shortcuts for common actions  
+
+---
+
+## Library usage
+
+Add Musix to your project with the following dependency.
 
 ```xml
 <!-- Maven -->
@@ -91,10 +90,13 @@ public class Demo {
 }
 ```
 
-Full API documentation is in the `docs` directory:  
-[docs](https://github.com/shubhyagami/musix/tree/main/docs)
+The complete API is documented in the Javadoc and can be found in the `docs` directory.
 
-## API Overview (selected)
+- **[API Reference](https://github.com/shubhyagami/musix/tree/main/docs)**
+
+---
+
+## Selected API overview
 
 | Method | Purpose |
 |--------|---------|
@@ -106,36 +108,41 @@ Full API documentation is in the `docs` directory:
 | `addListener(Consumer<Event>)` | Register a callback for playback events |
 | `exportPlaylist(String)` | Export the current playlist as M3U or JSON |
 
-See the Javadoc for detailed usage.
+---
 
 ## Architecture
 
 | Layer | Responsibility |
-|-------|----------------|
+|-------|-----------------|
 | **Audio Engine** | Deterministic, low‑latency playback with sub‑second cross‑fades |
-| **WebSocket Layer** | Minimal‑state real‑time collaboration |
+| **WebSocket Layer** | Minimal state real‑time collaboration |
 | **Server** | Self‑contained Jetty HTTP + WebSocket listener exposing the API |
+
+---
 
 ## Contributing
 
 We welcome contributions!  
 1. Fork the repo and create a feature branch (`git checkout -b feature/xxxx`).  
-2. Add unit tests for new behaviour.  
+2. Add unit tests for any new or changed behaviour.  
 3. Run `mvn test` and ensure all tests pass.  
-4. Submit a pull request to `main`.  
+4. Submit a pull request against `main`.  
 
-Additional guidelines are in [`CONTRIBUTING.md`](CONTRIBUTING.md) and the Code of Conduct.
+Additional guidelines are in [`CONTRIBUTING.md`](CONTRIBUTING.md) and the [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
+
+---
 
 ## Changelog
 
 ### v1.0.0 – 2026‑09‑07
 
-- Initial release
-- Deterministic low‑latency audio engine
-- WebSocket‑based playlist collaboration
-- Configurable local cache
-- Adaptive recommendation hook
-- Keyboard shortcuts and export support
+- Initial release with deterministic audio engine  
+- WebSocket‑based playlist collaboration  
+- Configurable in‑memory cache  
+- Adaptive recommendation hook  
+- Keyboard shortcuts and playlist export support
+
+---
 
 ## License
 
