@@ -1,11 +1,10 @@
 [K[2m  [2mmodel z-ai/glm-5.3-flash failed, trying next...[0m[0m
-[K[2m  [2mmodel deepseek-ai/deepseek-v4.1-flash failed, trying next...[0m[0m
 # Musix
 
-A lightweight, deterministic audio playback library for Java 17+.  
-It ships its own Jetty server that exposes HTTP and WebSocket APIs, making real‑time playlist collaboration trivial. Ideal for embedded devices or cloud‑friendly environments.
+A lightweight, deterministic audio playback library for Java 17+.  
+It ships with an embedded Jetty server that exposes HTTP and WebSocket APIs, making real-time playlist collaboration straightforward. It is suitable for embedded devices and cloud-friendly environments.
 
-[![Java 17+](https://img.shields.io/badge/Java-17%2B-blue)](https://openjdk.org/projects/jdk/17)
+[![Java 17+](https://img.shields.io/badge/Java-17%2B-blue)](https://openjdk.org/projects/jdk/17)
 [![Build](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/ci.yml?branch=main&label=build)](https://github.com/shubhyagami/musix/actions/workflows/ci.yml)
 [![Tests](https://img.shields.io/github/actions/workflow/status/shubhyagami/musix/tests.yml?branch=main&label=tests)](https://github.com/shubhyagami/musix/actions/workflows/tests.yml)
 [![Codecov](https://img.shields.io/codecov/c/github/shubhyagami/musix)](https://app.codecov.io/gh/shubhyagami/musix)
@@ -17,18 +16,20 @@ It ships its own Jetty server that exposes HTTP and WebSocket APIs, making real�
 
 ## Features
 
-- Deterministic, low‑latency playback with sub‑second cross‑fades  
-- Minimal memory footprint – great for embedded or low‑resource environments  
-- In‑memory cache for decoded tracks (configurable size)  
-- Export playlists to M3U or JSON  
-- Extendable recommendation hook  
-- Optional real‑time playlist collaboration over WebSocket
+- Deterministic, low-latency playback with sub-second cross-fades
+- Small memory footprint, suitable for embedded and low-resource environments
+- In-memory cache for decoded tracks (configurable size)
+- Playlist export to M3U or JSON
+- Extendable recommendation hook
+- Optional real-time playlist collaboration over WebSocket
 
 ---
 
 ## Getting Started
 
-### Clone & Build
+Requires Java 17+ and Maven 3.8+ when building from source.
+
+### Clone and Build
 
     git clone https://github.com/shubhyagami/musix.git
     cd musix
@@ -40,10 +41,10 @@ It ships its own Jetty server that exposes HTTP and WebSocket APIs, making real�
 
 The server listens on `http://localhost:8080`.
 
-* **Health‑check** – `http://localhost:8080/health`  
-* **WebSocket** – `ws://localhost:8080/ws`
+- **Health check** – `http://localhost:8080/health`
+- **WebSocket** – `ws://localhost:8080/ws`
 
-Use `--help` to explore available command‑line flags.
+Use `--help` to see all available command-line flags.
 
 ### Library Integration
 
@@ -83,12 +84,12 @@ Full API documentation is generated in the `docs/` directory.
 
 ---
 
-## Server Command‑Line Flags
+## Server Command-Line Flags
 
 | Flag | Description |
 |------|-------------|
 | `--port <p>` | HTTP/WebSocket port (default: `8080`) |
-| `--sync` | Enable real‑time playlist collaboration |
+| `--sync` | Enable real-time playlist collaboration |
 | `--cache-limit <N>` | Max number of decoded tracks kept in memory |
 | `--export-playlist <name>` | Export the named playlist to M3U or JSON |
 | `--help` | Show help message |
@@ -99,8 +100,8 @@ Full API documentation is generated in the `docs/` directory.
 
 | Layer | Responsibility |
 |-------|-----------------|
-| **Audio Engine** | Deterministic playback with cross‑fades |
-| **WebSocket Layer** | Minimal‑state, real‑time collaboration |
+| **Audio Engine** | Deterministic playback with cross-fades |
+| **WebSocket Layer** | Minimal-state, real-time collaboration |
 | **Jetty Server** | HTTP + WebSocket API serving the engine |
 
 ---
@@ -116,25 +117,25 @@ Full API documentation is generated in the `docs/` directory.
 
 ## Changelog
 
-### 1.0.0 – 2026‑09‑07
-- Initial public release  
-- Deterministic audio engine with sub‑second cross‑fades  
-- WebSocket‑based real‑time playlist collaboration  
-- Configurable in‑memory cache for decoded tracks  
-- Adaptive recommendation hook support  
-- Keyboard shortcuts in demo server  
+### 1.0.0 – 2026-09-07
+- Initial public release
+- Deterministic audio engine with sub-second cross-fades
+- WebSocket-based real-time playlist collaboration
+- Configurable in-memory cache for decoded tracks
+- Adaptive recommendation hook support
+- Keyboard shortcuts in demo server
 - Playlist export to M3U and JSON
 
 ---
 
 ## Contributing
 
-We welcome contributions!
+Contributions are welcome.
 
-1. Fork the repo and create a feature branch  
-   `git checkout -b feature/xxxx`  
-2. Add tests for new functionality  
-3. Run `mvn test` – ensure everything passes  
+1. Fork the repository and create a feature branch  
+   `git checkout -b feature/xxxx`
+2. Add tests for new functionality
+3. Run `mvn test` and ensure everything passes
 4. Submit a pull request against `main`
 
 Additional guidelines are in `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`.
@@ -144,5 +145,3 @@ Additional guidelines are in `CONTRIBUTING.md` and `CODE_OF_CONDUCT.md`.
 ## License
 
 MIT © 2026 Shubhyagami
-
----
